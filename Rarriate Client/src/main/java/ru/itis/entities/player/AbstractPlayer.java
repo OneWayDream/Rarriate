@@ -11,8 +11,8 @@ import ru.itis.entities.player.IPlayer;
 public abstract class AbstractPlayer extends Rectangle implements IPlayer {
 
     protected String name;
-    protected static final double HEIGHT = 100;
-    protected static final double WIDTH = 500;
+    protected static final double HEIGHT = 50;
+    protected static final double WIDTH = 50;
 
 
     public AbstractPlayer(String name) {

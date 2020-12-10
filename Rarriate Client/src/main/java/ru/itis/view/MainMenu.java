@@ -86,14 +86,50 @@ public class MainMenu {
         createBackButton();
     }
 
-    private void setMultiPlayerScene() {
+    private void setChooseMultiPlayerScene() {
+        mainPane.getChildren().clear();
+
+        createLogo();
+
+        ModernButton hostButton = new ModernButton("Host");
+        hostButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setMultiPlayerHostScene();
+            }
+        });
+
+        ModernButton connectButton = new ModernButton("Connect");
+        connectButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setMultiPlayerConnectScene();
+            }
+        });
+
+        mainPane.getChildren().addAll(hostButton, connectButton);
+        createBackButton();
+    }
+
+    private void setMultiPlayerHostScene() {
+        mainPane.getChildren().clear();
+
+        createLogo();
+        createNameField();
+        createPortField();
+        createStartMultiPlayerHostButton();
+        createBackButton();
+    }
+
+
+    private void setMultiPlayerConnectScene() {
         mainPane.getChildren().clear();
 
         createLogo();
         createNameField();
         createIPField();
         createPortField();
-        createEnterMultiPlayerButton();
+        createEnterMultiPlayerConnectButton();
         createBackButton();
     }
 
@@ -130,7 +166,7 @@ public class MainMenu {
         multiplayer.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                setMultiPlayerScene();
+                setChooseMultiPlayerScene();
             }
         });
         mainPane.getChildren().add(multiplayer);
@@ -163,6 +199,7 @@ public class MainMenu {
 
 
     //MultiPlayer
+
     private void createIPField() {
         ModernLabel ipLabel = new ModernLabel("IP:");
         VBox.setMargin(ipLabel, new Insets(0,0,-25,0));
@@ -179,9 +216,14 @@ public class MainMenu {
         mainPane.getChildren().addAll(portLabel, portField);
     }
 
-    private void createEnterMultiPlayerButton() {
+    private void createEnterMultiPlayerConnectButton() {
         ModernButton enter = new ModernButton("Enter");
         mainPane.getChildren().add(enter);
+    }
+
+    private void createStartMultiPlayerHostButton() {
+        ModernButton startServer = new ModernButton("Run server");
+        mainPane.getChildren().add(startServer);
     }
 
     private void createBackButton() {

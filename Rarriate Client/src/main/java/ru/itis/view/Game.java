@@ -68,8 +68,8 @@ public class Game {
 
         player = new Player();
 
-        player.setX((mainStage.getWidth() - player.getWidth())/2);
-        player.setY((mainStage.getHeight() - player.getHeight())/2);
+        player.setTranslateX((mainStage.getWidth() - player.getWidth())/2);
+        player.setTranslateY((mainStage.getHeight() - player.getHeight())/2);
 
         pane.getChildren().add(player);
 
@@ -97,19 +97,46 @@ public class Game {
     }
 
     private void update() {
-        if (up && player.getY() >= speed) {
+        if (up && player.getTranslateY() >= speed) {
             player.moveY(-speed);
         }
 
-        if (left && player.getX() > 0 && checkLeft()) {
-            player.moveX(-speed);
+        if (left && player.getTranslateY() > 0) {
+//            player.moveX(-speed);
+            movePlayerX(-speed);
         }
 
-        if (right && player.getX() + player.getWidth() <= mainScene.getWidth()) {
-            player.moveX(speed);
+        if (right && player.getTranslateX() + player.getWidth() <= mainScene.getWidth()) {
+//            player.moveX(speed);
+            movePlayerX(speed);
         }
 
         checkBottom();
+    }
+
+    private void movePlayerX(int value) {
+        boolean movingRight = value > 0;
+        System.out.println(player.getX());
+        for (int i = 0; i < Math.abs(value); i++) {
+            for (Block block : blocks) {
+                System.out.println("Block: " + block.getTranslateX()    );
+                System.out.println("Player: " + player.getTranslateX());
+                if (player.getBoundsInParent().intersects(block.getBoundsInParent())) {
+                    if (movingRight) {
+                        if (player.getTranslateX() + player.getWidth() == block.getTranslateX()) {
+                            return;
+                        }
+                    }
+                    else {
+                        if (player.getTranslateX() == block.getTranslateX() + block.getWidth()) {
+                            return;
+                        }
+                    }
+                }
+            }
+            player.setTranslateX(player.getTranslateX() + (movingRight ? 1 : -1));
+            System.out.println(true);
+        }
     }
 
     private boolean checkLeft() {
@@ -127,12 +154,12 @@ public class Game {
     private void checkBottom() {
         for (Block block : blocks) {
             if (player.getBoundsInParent().intersects(block.getBoundsInParent())) {
-                if (player.getY() + player.getHeight() == block.getLayoutY()) {
+                if (player.getTranslateY() + player.getHeight() == block.getTranslateY()) {
                     return;
                 }
             }
         }
-        player.setY(player.getY() + fallingSpeed);
+        player.setTranslateY(player.getTranslateY() + fallingSpeed);
     }
 
     private void jumpPlayer() {
@@ -167,6 +194,13 @@ public class Game {
         blocks = new ArrayList<>();
         DirtBlock dirtBlock = new DirtBlock();
         blocks.add(dirtBlock);
+        dirtBlock.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                mainPane.getChildren().remove(dirtBlock);
+                blocks.remove(dirtBlock);
+            }
+        });
         setNode(50, (int)(mainScene.getHeight()-dirtBlock.getHeight() - 50), dirtBlock);
 
         int i = 0;
@@ -174,18 +208,26 @@ public class Game {
             DirtBlock block = new DirtBlock();
             setNode(50*i, (int)(mainScene.getHeight()-block.getHeight()), block);
             blocks.add(block);
+            block.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    mainPane.getChildren().remove(block);
+                    blocks.remove(block);
+                }
+            });
+
             i++;
         }
     }
 
-    private void setBackground(){
-        mainPane.setBackground(new Background(FileLoader.getGameBackground()));
+    private void setNode(int x, int y, Node item) {
+        item.setTranslateX(x);
+        item.setTranslateY(y);
+        mainPane.getChildren().add(item);
     }
 
-    private void setNode(int x, int y, Node item) {
-        item.setLayoutX(x);
-        item.setLayoutY(y);
-        mainPane.getChildren().add(item);
+    private void setBackground(){
+        mainPane.setBackground(new Background(FileLoader.getGameBackground()));
     }
 
     private void exitToMainMenu() {
