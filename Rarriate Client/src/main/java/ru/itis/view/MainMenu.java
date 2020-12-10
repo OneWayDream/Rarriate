@@ -10,6 +10,10 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
+import ru.itis.RarriateApplication;
+import ru.itis.entities.Map;
+import ru.itis.entities.World;
+import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.utils.FileLoader;
 import ru.itis.utils.MediaLoader;
 import ru.itis.utils.PropertiesLoader;
@@ -18,6 +22,7 @@ import ru.itis.view.components.ModernLabel;
 import ru.itis.view.components.ModernTextField;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 
 public class MainMenu {
 
@@ -116,7 +121,6 @@ public class MainMenu {
 
         createLogo();
         createNameField();
-        createPortField();
         createStartMultiPlayerHostButton();
         createBackButton();
     }
@@ -223,6 +227,14 @@ public class MainMenu {
 
     private void createStartMultiPlayerHostButton() {
         ModernButton startServer = new ModernButton("Run server");
+        startServer.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                World world = new World(new Map(), new ArrayList<AbstractPlayer>());
+                RarriateApplication.startServer(world);
+                viewManager.setMultiPlayerScene(world);
+            } //TODO stop play music
+        });
         mainPane.getChildren().add(startServer);
     }
 

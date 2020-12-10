@@ -2,15 +2,17 @@ package ru.itis.view;
 
 import javafx.animation.AnimationTimer;
 import javafx.event.EventHandler;
-import javafx.geometry.Point2D;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
+import ru.itis.RarriateApplication;
+import ru.itis.entities.Map;
+import ru.itis.entities.World;
 import ru.itis.entities.blocks.Block;
-import ru.itis.entities.blocks.implBlocks.DirtBlock;
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.entities.player.implPlayers.Player;
 import ru.itis.utils.FileLoader;
@@ -18,54 +20,61 @@ import ru.itis.utils.MediaLoader;
 import ru.itis.utils.PropertiesLoader;
 import ru.itis.view.components.ModernButton;
 
-import java.util.ArrayList;
+import java.awt.event.KeyListener;
 import java.util.List;
 
 public class Game {
 
-    private Stage mainStage;
-    private Scene mainScene;
-    private Pane mainPane;
+    protected Stage mainStage;
+    protected Scene mainScene;
+    protected Pane mainPane;
 
-    private AbstractPlayer player;
+    protected AbstractPlayer player;
 
-    private List<Block> blocks;
+    protected List<Block> blocks;
 
-    private ViewManager viewManager;
+    protected ViewManager viewManager;
 
-    private MediaPlayer mediaPlayer;
+    protected MediaPlayer mediaPlayer;
 
-    private int speed = 10;
-    private int fallingSpeed = speed/2;
+    protected World world;
 
-    private boolean up;
-    private boolean down;
-    private boolean left;
-    private boolean right;
+    protected int speed = 10;
+    protected int fallingSpeed = speed/2;
+
+    protected boolean up;
+    protected boolean down;
+    protected boolean left;
+    protected boolean right;
 
     public Game(Stage stage, ViewManager viewManager){
+        createGUI(stage, viewManager);
+    }
 
+    public Game(Stage stage, ViewManager viewManager, World world) {
+        this.world = world;
+        createGUI(stage, viewManager);
+    }
+
+    protected void createGUI(Stage stage, ViewManager viewManager) {
         mainStage = stage;
         this.viewManager = viewManager;
-        Pane pane = new Pane();
+            Pane pane = new Pane();
+            Scene scene = new Scene(pane, mainStage.getWidth(), mainStage.getHeight());
 
-        ModernButton exit = new ModernButton("EXIT");
+            ModernButton exit = new ModernButton("EXIT");
         exit.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                exitToMainMenu();
-            }
+                @Override
+                public void handle(MouseEvent event) {
+                    exitToMainMenu();
+                }
         });
         pane.getChildren().add(exit);
 
         player = new Player();
-
-        player.setTranslateX((mainStage.getWidth() - player.getWidth())/2);
-        player.setTranslateY((mainStage.getHeight() - player.getHeight())/2);
-
+        player.setTranslateX((scene.getWidth() - player.getWidth())/2);
+        player.setTranslateY((scene.getHeight() - player.getHeight())/2);
         pane.getChildren().add(player);
-
-        Scene scene = new Scene(pane, mainStage.getWidth(), mainStage.getHeight());
 
         scene.setOnKeyPressed(e -> processKey(e.getCode(), true));
         scene.setOnKeyReleased(e -> processKey(e.getCode(), false));
@@ -85,10 +94,9 @@ public class Game {
 
         timer.start();
         playGameBackgroundMusic();
-
     }
 
-    private void update() {
+    protected void update() {
         if (up && player.getTranslateY() >= speed) {
             jumpPlayer(player);
         }
@@ -96,6 +104,7 @@ public class Game {
         if (left && player.getTranslateX() > 0) {
             movePlayerX(-speed, player);
         }
+
         if (right && player.getTranslateX() + player.getWidth() <= mainScene.getWidth()) {
             movePlayerX(speed, player);
         }
@@ -107,14 +116,18 @@ public class Game {
         movePlayerY((int)player.getVelocity().getY(), player);
     }
 
-    private void jumpPlayer(AbstractPlayer player) {
+    protected void update(String name) {
+
+    }
+
+    protected void jumpPlayer(AbstractPlayer player) {
         if (player.isCanJump()) {
             player.setVelocity(player.getVelocity().add(0, -30));
             player.setCanJump(false);
         }
     }
 
-    private void movePlayerX(int value, AbstractPlayer player) {
+    protected void movePlayerX(int value, AbstractPlayer player) {
         boolean movingRight = value > 0;
 
         for (int i = 0; i < Math.abs(value); i++) {
@@ -132,11 +145,12 @@ public class Game {
                     }
                 }
             }
-            player.setTranslateX(player.getTranslateX() + (movingRight ? 1 : -1));
+            player.moveX(movingRight ? 1 : -1);
+//            RarriateApplication.getClient().sendUDPFrame(null);
         }
     }
 
-    private void movePlayerY(int value, AbstractPlayer player) {
+    protected void movePlayerY(int value, AbstractPlayer player) {
         boolean movingDown = value > 0;
 
         for (int i = 0; i < Math.abs(value); i++) {
@@ -144,7 +158,7 @@ public class Game {
                 if (player.getBoundsInParent().intersects(block.getBoundsInParent())) {
                     if (movingDown) {
                         if (player.getTranslateY() + player.getHeight() == block.getTranslateY()) {
-                            player.setTranslateY(player.getTranslateY() - 1);
+                            player.moveY(- 1);
                             player.setCanJump(true);
                             return;
                         }
@@ -156,11 +170,11 @@ public class Game {
                     }
                 }
             }
-            player.setTranslateY(player.getTranslateY() + (movingDown ? 1 : -1));
+            player.moveY(movingDown ? 1 : -1);
         }
     }
 
-    private void processKey(KeyCode code, boolean on) {
+    protected void processKey(KeyCode code, boolean on) {
         switch (code) {
             case A:
                 left = on ;
@@ -183,49 +197,47 @@ public class Game {
         return mainScene;
     }
 
-    private void generateLevel() {
-        blocks = new ArrayList<>();
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 40; j++) {
-                DirtBlock dirtBlock = new DirtBlock();
-                setNode(dirtBlock.getWidth() * j, mainScene.getHeight() - (dirtBlock.getHeight() * i), dirtBlock);
-                blocks.add(dirtBlock);
-                dirtBlock.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        if(Math.abs(player.getTranslateX() - dirtBlock.getTranslateX()) <= 150 &&
-                            Math.abs(player.getTranslateY() - dirtBlock.getTranslateY()) <= 150){
-                            mainPane.getChildren().remove(dirtBlock);
-                            blocks.remove(dirtBlock);
-                        }
+    protected void generateLevel() {
+        if (world == null) {
+            world = new World(new Map(), null);
+        }
+        blocks = world.getMap().getBlocks();
 
+        for (Block block: blocks) {
+            setBlock(block);
+            block.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    if(Math.abs(player.getTranslateX() - block.getTranslateX()) <= 150 &&
+                        Math.abs(player.getTranslateY() - block.getTranslateY()) <= 150){
+                        mainPane.getChildren().remove(block);
+                        blocks.remove(block);
                     }
-                });
-            }
+                }
+            });
         }
     }
 
-    private void setNode(double x, double y, Block item) {
-        item.setTranslateX(x);
-        item.setTranslateY(y);
-        mainPane.getChildren().add(item);
+    protected void setBlock(Block block) {
+        mainPane.getChildren().add(block);
     }
 
-    private void setBackground(){
+    protected void setBackground(){
         mainPane.setBackground(new Background(FileLoader.getGameBackground()));
     }
 
-    private void exitToMainMenu() {
+    protected void exitToMainMenu() {
         stopPlayingBackgroundMusic();
         viewManager.setMainMenuScene();
     }
 
-    private void playGameBackgroundMusic() {
+    protected void playGameBackgroundMusic() {
         mediaPlayer = MediaLoader.getGameBackgroundMusic();
+        mediaPlayer.setVolume(Integer.parseInt(PropertiesLoader.getInstance().getProperty("MUSIC_VOLUME")));
         mediaPlayer.play();
     }
 
-    private void stopPlayingBackgroundMusic() {
+    protected void stopPlayingBackgroundMusic() {
         mediaPlayer.stop();
     }
 }

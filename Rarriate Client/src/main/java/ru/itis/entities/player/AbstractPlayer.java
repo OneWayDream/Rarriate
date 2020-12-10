@@ -1,12 +1,9 @@
 package ru.itis.entities.player;
 
 import javafx.geometry.Point2D;
-import javafx.scene.Node;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
-import ru.itis.entities.player.IPlayer;
 
 
 public abstract class AbstractPlayer extends Rectangle{
@@ -42,5 +39,13 @@ public abstract class AbstractPlayer extends Rectangle{
 
     protected void fillPlayer(Image image) {
         setFill(new ImagePattern(image));
+    }
+
+    public void moveX(double value){
+        setTranslateX(getTranslateX() + value);
+    }
+
+    public void moveY(double value) {
+        setTranslateY(getTranslateY() + value);
     }
 }
