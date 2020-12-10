@@ -233,7 +233,7 @@ public class MainMenu {
                 World world = new World(new Map(), new ArrayList<AbstractPlayer>());
                 RarriateApplication.startServer(world);
                 viewManager.setMultiPlayerScene(world);
-            } //TODO stop play music
+            }
         });
         mainPane.getChildren().add(startServer);
     }

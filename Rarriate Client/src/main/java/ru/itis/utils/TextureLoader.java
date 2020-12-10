@@ -39,4 +39,55 @@ public class TextureLoader {
         }
         return null;
     }
+
+    public static Image[] getPlayer1SpriteRight() {
+        try {
+            Image[] images = new Image[3];
+            images[0] = new Image(Objects.requireNonNull(TextureLoader.class
+                    .getClassLoader()
+                    .getResourceAsStream("img/players/Spider Man/Run Right/1.png")));
+            images[1] = new Image(Objects.requireNonNull(TextureLoader.class
+                    .getClassLoader()
+                    .getResourceAsStream("img/players/Spider Man/Run Right/2.png")));
+            images[2] = new Image(Objects.requireNonNull(TextureLoader.class
+                    .getClassLoader()
+                    .getResourceAsStream("img/players/Spider Man/Run Right/3.png")));
+            return images;
+        } catch (NullPointerException e) {
+            RarriateStart.showError(new ImageFileNotFoundException("Can't find Spider Man/Run Right files", e));
+        }
+        return null;
+    }
+
+    public static Image[] getPlayer1SpriteLeft() {
+        try {
+            Image[] images = new Image[3];
+            images[0] = new Image(Objects.requireNonNull(TextureLoader.class
+                    .getClassLoader()
+                    .getResourceAsStream("img/players/Spider Man/Run Left/1.png")));
+            images[1] = new Image(Objects.requireNonNull(TextureLoader.class
+                    .getClassLoader()
+                    .getResourceAsStream("img/players/Spider Man/Run Left/2.png")));
+            images[2] = new Image(Objects.requireNonNull(TextureLoader.class
+                    .getClassLoader()
+                    .getResourceAsStream("img/players/Spider Man/Run Left/3.png")));
+            return images;
+        } catch (NullPointerException e) {
+            RarriateStart.showError(new ImageFileNotFoundException("Can't find Spider Man/Run Left files", e));
+        }
+        return null;
+    }
+
+    public static Image[] getPlayer1SpriteIdle() {
+        try {
+            Image[] images = new Image[1];
+            images[0] = new Image(Objects.requireNonNull(TextureLoader.class
+                    .getClassLoader()
+                    .getResourceAsStream("img/players/Spider Man/Idle/1.png")));
+            return images;
+        } catch (NullPointerException e) {
+            RarriateStart.showError(new ImageFileNotFoundException("Can't find Spider Man/Idle files", e));
+        }
+        return null;
+    }
 }

@@ -178,9 +178,17 @@ public class Game {
         switch (code) {
             case A:
                 left = on ;
+                player.setAnimation(AbstractPlayer.RUN_LEFT);
+                if (!on) {
+                    player.setAnimation(AbstractPlayer.IDLE);
+                }
                 break ;
             case D:
                 right = on ;
+                player.setAnimation(AbstractPlayer.RUN_RIGHT);
+                if (!on) {
+                    player.setAnimation(AbstractPlayer.IDLE);
+                }
                 break ;
             case W:
                 up = on ;
