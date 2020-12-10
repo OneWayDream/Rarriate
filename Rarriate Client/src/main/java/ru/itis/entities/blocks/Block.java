@@ -14,11 +14,9 @@ public abstract class Block extends Rectangle {
 
     protected static final double HEIGHT = 50;
     protected static final double WIDTH = 50;
-    protected int durability;
 
     public Block(){
         super(WIDTH, HEIGHT);
-        durability = 1;
     }
 
 
