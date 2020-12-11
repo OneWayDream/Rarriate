@@ -2,6 +2,7 @@ package ru.itis.view;
 
 import javafx.animation.AnimationTimer;
 import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -39,6 +40,7 @@ public class Game {
     protected ModernText chat;
 
     protected AbstractPlayer player;
+//    protected Point2D velocity;
 
     protected List<Block> blocks;
 
@@ -52,6 +54,7 @@ public class Game {
     protected int fillMessages;
 
     protected Integer port;
+
 
     protected boolean up;
     protected boolean down;
@@ -89,6 +92,7 @@ public class Game {
         }
         player.setTranslateX((scene.getWidth() - player.getWidth())/2);
         player.setTranslateY((scene.getHeight() - player.getHeight())/2);
+//        velocity = new Point2D(0,0);
         pane.getChildren().add(player);
 
         scene.setOnKeyPressed(e -> processKey(e.getCode(), true));
