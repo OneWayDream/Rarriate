@@ -10,12 +10,15 @@
 ### 1-2 : registration frames
 
 #### (1) client - contains user nickname and UDP address info
-###### order - message id, username, client udp-get address and player data.
+###### order - message id, client udp-get address and player data.
 
 #### (2) server - contains info about player on this server
-###### order - message id, client id, server udp get address and server id
+###### order - message id, client id, server udp get address, server id and world info
 
 ### 3 : server answer that player with such nickname already exist
+
+### 4 : server says that new player was connected
+###### order - message id, player data
 
 /*---------------------------------------------------------------------------*\
 

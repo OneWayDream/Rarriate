@@ -1,6 +1,7 @@
 package ru.itis.server;
 
 import lombok.*;
+import ru.itis.entities.World;
 import ru.itis.exceptions.*;
 import ru.itis.protocol.TCPFrame;
 import ru.itis.protocol.TCPFrameFactory;
@@ -34,14 +35,17 @@ public class SocketServer implements Server {
     protected UDPFrameFactory udpFrameFactory;
     protected TCPFrameFactory tcpFrameFactory;
     protected boolean isWork;
+    protected World world;
 
-    public static SocketServer init(ServerKeyManager keyManager, UDPFrameFactory udpFrameFactory, TCPFrameFactory tcpFrameFactory){
+    public static SocketServer init(ServerKeyManager keyManager, UDPFrameFactory udpFrameFactory,
+                                    TCPFrameFactory tcpFrameFactory, World world){
         return SocketServer.builder()
                 .keyManager(keyManager)
                 .clientSet(new HashSet<>())
                 .udpFrameFactory(udpFrameFactory)
                 .tcpFrameFactory(tcpFrameFactory)
                 .serverUuid(UUID.randomUUID())
+                .world(world)
                 .build();
     }
 

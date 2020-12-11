@@ -1,5 +1,6 @@
 package ru.itis.utils;
 
+import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.exceptions.*;
 import ru.itis.protocol.TCPFrame;
 import ru.itis.protocol.UDPFrame;
@@ -32,10 +33,10 @@ public class RarriateServerKeyManager implements ServerKeyManager {
             if (tcpFrame!=null){
                 if (tcpFrame.getType()==1){
                     Object[] userData = tcpFrame.getContent();
-                    String username = (String) userData[1];
+                    AbstractPlayer player = (AbstractPlayer) userData[2];
                     boolean isUniqueNickname = true;
                     for (ClientEntry clientEntry: socketServer.getClientSet()) {
-                        if (clientEntry.getNickname().equals(username)){
+                        if (clientEntry.getPlayer().getNickname().equals(player.getNickname())){
                             isUniqueNickname = false;
                             break;
                         }
@@ -55,22 +56,28 @@ public class RarriateServerKeyManager implements ServerKeyManager {
 
                         System.out.println("Проверил, всё ок");
 
+
                         UUID responseFrameId = UUID.randomUUID();
                         TCPFrame tcpFrameResponse = socketServer.getTcpFrameFactory().createTCPFrame(2,
                                 responseFrameId, clientUUID, socketServer.getServerUDPChannel().getLocalAddress(),
-                                socketServer.getServerUuid());
+                                socketServer.getServerUuid(), socketServer.getWorld());
                         socketServer.getTcpFrameFactory().writeTCPFrame(client, tcpFrameResponse);
 
                         System.out.println("Отправил пакет с настройками");
 
                         ClientEntry clientEntry = RarriateClientEntry.builder()
-                                .player((Player) userData[3])
+                                .player((AbstractPlayer) userData[2])
                                 .uuid(clientUUID)
-                                .datagramAddress((InetSocketAddress) userData[2])
-                                .nickname(username)
+                                .datagramAddress((InetSocketAddress) userData[1])
                                 .socketChannel(client)
                                 .build();
                         socketServer.getClientSet().add(clientEntry);
+
+                        UUID clientNotification = UUID.randomUUID();
+                        socketServer.getWorld().getPlayers().add(player);
+                        socketServer.sendBroadcastTCP(
+                                socketServer.getTcpFrameFactory().createTCPFrame(4, clientNotification, player);
+                        );
 
 
                         client.configureBlocking(false);
@@ -123,8 +130,6 @@ public class RarriateServerKeyManager implements ServerKeyManager {
                         case 0:
                             int moveX = (int) messageContent[1];
                             int moveY = (int) messageContent[2];
-
-                            System.out.println("Player " + client.getNickname() + " moved to (" + moveX + ", " + moveY + ").");
 
                             break;
                     }

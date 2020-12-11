@@ -1,6 +1,7 @@
 package ru.itis.utils;
 
 import lombok.*;
+import ru.itis.entities.player.AbstractPlayer;
 
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
@@ -13,10 +14,9 @@ import java.util.UUID;
 @Builder
 public class RarriateClientEntry implements ClientEntry {
 
-    protected String nickname;
     protected UUID uuid;
     protected SocketChannel socketChannel;
     protected InetSocketAddress datagramAddress;
-    protected Player player;
+    protected AbstractPlayer player;
 
 }

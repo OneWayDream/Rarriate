@@ -1,13 +1,14 @@
 package ru.itis.client;
 
 import lombok.*;
+import ru.itis.entities.World;
+import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.exceptions.*;
 import ru.itis.protocol.TCPFrame;
 import ru.itis.protocol.TCPFrameFactory;
 import ru.itis.protocol.UDPFrame;
 import ru.itis.protocol.UDPFrameFactory;
 import ru.itis.utils.ClientKeyManager;
-import ru.itis.utils.Player;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -33,6 +34,7 @@ public class SocketClient implements Client {
     protected TCPFrameFactory tcpFrameFactory;
     protected UUID clientUuid;
     protected UUID serverUuid;
+    protected World world;
     boolean isWork;
 
     public static SocketClient init(ClientKeyManager keyManager, UDPFrameFactory udpFrameFactory, TCPFrameFactory tcpFrameFactory){
@@ -45,7 +47,7 @@ public class SocketClient implements Client {
 
     @Override
     public void connect(InetSocketAddress serverAddress, InetSocketAddress clientUDPGetAddress
-            , Player playerData, String username) throws ClientException {
+            , AbstractPlayer playerData) throws ClientException {
         try{
             isWork = true;
             selector = Selector.open();
@@ -55,7 +57,7 @@ public class SocketClient implements Client {
             System.out.println("Успешно подключился к серверу");
 
             UUID infoFrameId = UUID.randomUUID();
-            TCPFrame clientInfoTCPFrame = tcpFrameFactory.createTCPFrame(1, infoFrameId, username,
+            TCPFrame clientInfoTCPFrame = tcpFrameFactory.createTCPFrame(1, infoFrameId,
                     clientUDPGetAddress, playerData);
             tcpFrameFactory.writeTCPFrame(clientSocketChannel, clientInfoTCPFrame);
 
@@ -68,6 +70,7 @@ public class SocketClient implements Client {
                 clientUuid = (UUID) serverResponseFrame.getContent()[1];
                 serverUDPAddress = (InetSocketAddress) serverResponseFrame.getContent()[2];
                 serverUuid = (UUID) serverResponseFrame.getContent()[3];
+                world = (World) serverResponseFrame.getContent()[4];
 
                 System.out.println("Донастроился");
 

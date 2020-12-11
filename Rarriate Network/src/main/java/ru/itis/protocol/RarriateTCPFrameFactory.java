@@ -64,18 +64,18 @@ public class RarriateTCPFrameFactory implements TCPFrameFactory {
                     switch (type){
                         //TODO switch options for different types
                         case 1:
-                            objects = new Object[4];
+                            objects = new Object[3];
                             objects[0] = inObject.readObject(); //Message id
-                            objects[1] = inObject.readObject(); //Username
-                            objects[2] = inObject.readObject(); //Client udp get address
-                            objects[3] = inObject.readObject(); //Player data
+                            objects[1] = inObject.readObject(); //Client udp get address
+                            objects[2] = inObject.readObject(); //Player data
                             break;
                         case 2:
-                            objects = new Object[4];
+                            objects = new Object[5];
                             objects[0] = inObject.readObject(); //Message id
                             objects[1] = inObject.readObject(); //Client id
                             objects[2] = inObject.readObject(); //Server udp get address
                             objects[3] = inObject.readObject(); //Server id
+                            objects[4] = inObject.readObject(); //World
                             break;
                         default:
                             objects = new Object[0];
