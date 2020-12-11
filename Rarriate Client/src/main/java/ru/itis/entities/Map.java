@@ -2,6 +2,7 @@ package ru.itis.entities;
 
 import ru.itis.entities.blocks.Block;
 import ru.itis.entities.blocks.implBlocks.DirtBlock;
+import ru.itis.entities.blocks.implBlocks.GrassBlock;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,5 +29,9 @@ public class Map implements Serializable {
                 blocks.add(dirtBlock);
             }
         }
+        GrassBlock grassBlock = new GrassBlock();
+        grassBlock.setTranslateX(50);
+        grassBlock.setTranslateY(800);
+        blocks.add(grassBlock);
     }
 }

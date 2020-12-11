@@ -29,6 +29,17 @@ public class TextureLoader {
         return null;
     }
 
+    public static Image getStoneTexture() {
+        try {
+            return new Image(Objects.requireNonNull(TextureLoader.class
+                    .getClassLoader()
+                    .getResourceAsStream("img/blocks/stone_block.png")));
+        } catch (NullPointerException e) {
+            RarriateStart.showError(new ImageFileNotFoundException("Can't find stone_block.png file", e));
+        }
+        return null;
+    }
+
     public static Image getPlayer1Texture() {
         try {
             return new Image(Objects.requireNonNull(TextureLoader.class
@@ -93,11 +104,9 @@ public class TextureLoader {
 
     public static Image getInventoryImage() {
         try {
-            //TODO return inventory.png
             return new Image(Objects.requireNonNull(TextureLoader.class
                     .getClassLoader()
-                    .getResourceAsStream("img/Rarriate-icon.png")));
-                    //.getResourceAsStream("img/inventory.png")));
+                    .getResourceAsStream("img/inventory.png")));
         } catch (NullPointerException e) {
             RarriateStart.showError(new ImageFileNotFoundException("Can't find inventory.png file", e));
         }

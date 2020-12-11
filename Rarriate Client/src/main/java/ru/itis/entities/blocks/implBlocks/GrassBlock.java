@@ -7,5 +7,6 @@ public class GrassBlock extends Block {
     public GrassBlock() {
         super();
         fillRectangle(TextureLoader.getGrassTexture());
+        id = 3;
     }
 }

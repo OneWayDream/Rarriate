@@ -15,7 +15,11 @@ import javafx.stage.Stage;
 import ru.itis.entities.Map;
 import ru.itis.entities.World;
 import ru.itis.entities.blocks.Block;
+import ru.itis.entities.blocks.implBlocks.GrassBlock;
 import ru.itis.entities.items.AbstractItem;
+import ru.itis.entities.items.implItems.DirtBlockItem;
+import ru.itis.entities.items.implItems.GrassBlockItem;
+import ru.itis.entities.items.implItems.StoneBlockItem;
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.entities.player.implPlayers.Player;
 import ru.itis.utils.FileLoader;
@@ -38,10 +42,10 @@ public class Game {
     protected Scene mainScene;
     protected Pane mainPane;
     protected ModernText chat;
+    protected Pane inventoryPane;
 
     protected AbstractPlayer player;
-//    protected Point2D velocity;
-
+    protected ImageView inventorySprite;
     protected List<Block> blocks;
 
     protected ViewManager viewManager;
@@ -54,7 +58,6 @@ public class Game {
     protected int fillMessages;
 
     protected Integer port;
-
 
     protected boolean up;
     protected boolean down;
@@ -78,15 +81,6 @@ public class Game {
         Pane pane = new Pane();
         Scene scene = new Scene(pane, mainStage.getWidth(), mainStage.getHeight());
 
-        ModernButton exit = new ModernButton("EXIT");
-        exit.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    exitToMainMenu();
-                }
-        });
-        pane.getChildren().add(exit);
-
         if (player == null) {
             player = new Player();
         }
@@ -109,6 +103,7 @@ public class Game {
         mainPane = pane;
         setBackground();
         generateLevel();
+        createExitToMainMenuButton();
         setInventory();
         timer.start();
         playGameBackgroundMusic();
@@ -169,7 +164,6 @@ public class Game {
                 }
             }
             player.moveX(movingRight ? 1 : -1);
-//            RarriateApplication.getClient().sendUDPFrame(null);
         }
     }
 
@@ -243,6 +237,8 @@ public class Game {
                         Math.abs(player.getTranslateY() - block.getTranslateY()) <= 150){
                         mainPane.getChildren().remove(block);
                         blocks.remove(block);
+                        player.getInventory().addItem(getItemFromBlock(block));
+                        updateInventory();
                     }
                 }
             });
@@ -250,16 +246,62 @@ public class Game {
     }
 
     protected void setInventory() {
-        ImageView inventorySprite = new ImageView(TextureLoader.getInventoryImage());
-        inventorySprite.setTranslateX(100);
-        inventorySprite.setTranslateY(100);
+        inventorySprite = new ImageView(TextureLoader.getInventoryImage());
+        inventorySprite.setFitHeight(100);
+        inventorySprite.setFitWidth(800);
+        inventorySprite.setTranslateX(10);
+        inventorySprite.setTranslateY(10);
         mainPane.getChildren().add(inventorySprite);
-//        List<AbstractItem> items = player.getInventory().getItems();
-//        items.get(0).setTranslateX(100);
-//        items.get(0).setTranslateY(100);
-//        mainPane.getChildren().add(items.get(0));
+
+        inventoryPane = new Pane();
+        mainPane.getChildren().add(inventoryPane);
     }
 
+    protected void updateInventory() {
+        List<AbstractItem> items = player.getInventory().getItems();
+        AbstractItem item;
+
+        mainPane.getChildren().remove(inventoryPane);
+        inventoryPane = new Pane();
+        inventoryPane.setTranslateX(inventorySprite.getTranslateX() + (double) AbstractItem.WIDTH/2);
+        inventoryPane.setTranslateY(inventorySprite.getTranslateY() + (double) AbstractItem.HEIGHT/2);
+
+        double offsetX = 0;
+        for (int i = 0; i < items.size() && i < 8; i++) {
+            item = items.get(i);
+            item.setTranslateX(offsetX/2);
+            item.setTranslateY((inventorySprite.getTranslateY()-10)/2);
+            inventoryPane.getChildren().add(item);
+            offsetX += AbstractItem.WIDTH * 4;
+        }
+        mainPane.getChildren().add(inventoryPane);
+    }
+
+    protected AbstractItem getItemFromBlock(Block block) {
+        switch (block.getBlockId()) {
+            case 1:
+                return new StoneBlockItem();
+            case 2:
+                return new DirtBlockItem();
+            case 3:
+                return new GrassBlockItem();
+            default:
+                return null;
+        }
+    }
+
+    protected void createExitToMainMenuButton() {
+        ModernButton exit = new ModernButton("EXIT");
+        exit.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                exitToMainMenu();
+            }
+        });
+        exit.setTranslateX(mainScene.getWidth() - 200);
+        exit.setTranslateY(mainScene.getHeight() - 60);
+        mainPane.getChildren().add(exit);
+    }
 
     protected void setBlock(Block block) {
         mainPane.getChildren().add(block);

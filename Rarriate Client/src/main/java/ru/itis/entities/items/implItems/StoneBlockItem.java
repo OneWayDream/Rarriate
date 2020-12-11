@@ -11,6 +11,6 @@ public class StoneBlockItem extends AbstractItem {
     public StoneBlockItem() {
         super();
         id = ID;
-        setSprite(TextureLoader.getDirtTexture());
+        setSprite(TextureLoader.getStoneTexture());
     }
 }

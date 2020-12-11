@@ -9,7 +9,6 @@ import ru.itis.entities.items.implItems.StoneBlockItem;
 import ru.itis.utils.MyPoint2D;
 
 import java.io.Serializable;
-import java.util.List;
 
 
 public abstract class AbstractPlayer extends Rectangle implements Serializable {
@@ -29,8 +28,6 @@ public abstract class AbstractPlayer extends Rectangle implements Serializable {
     protected Integer state;
     protected Inventory inventory;
 
-
-
     public AbstractPlayer(String name) {
         super(WIDTH, HEIGHT);
         this.name = name;
@@ -38,7 +35,6 @@ public abstract class AbstractPlayer extends Rectangle implements Serializable {
         velocity = new MyPoint2D(0,0);
         state = 0;
         inventory = new Inventory();
-        inventory.addItem(new StoneBlockItem());
     }
 
     public Inventory getInventory() {

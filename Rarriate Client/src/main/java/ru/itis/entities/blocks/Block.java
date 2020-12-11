@@ -11,14 +11,18 @@ import javafx.scene.shape.Rectangle;
 import java.io.InputStream;
 
 public abstract class Block extends Rectangle {
-
+    protected int id;
     protected static final double HEIGHT = 50;
     protected static final double WIDTH = 50;
 
     public Block(){
         super(WIDTH, HEIGHT);
+        id = -1;
     }
 
+    public int getBlockId() {
+        return id;
+    }
 
     protected void fillRectangle(Image image) {
         setFill(new ImagePattern(image));

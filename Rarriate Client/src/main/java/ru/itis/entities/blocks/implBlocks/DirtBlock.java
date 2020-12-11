@@ -11,6 +11,7 @@ public class DirtBlock extends Block {
     public DirtBlock() {
         super();
         fillRectangle(TextureLoader.getDirtTexture());
+        id = 2;
     }
 
 }

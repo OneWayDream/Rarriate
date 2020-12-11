@@ -7,8 +7,8 @@ import ru.itis.utils.FileLoader;
 import java.io.Serializable;
 
 public abstract class AbstractItem extends ImageView implements Serializable {
-    protected final static int WIDTH = 32;
-    protected final static int HEIGHT = 32;
+    public final static int WIDTH = 50;
+    public final static int HEIGHT = 50;
 
     protected int id;
     protected int count;
@@ -41,4 +41,12 @@ public abstract class AbstractItem extends ImageView implements Serializable {
         count--;
     }
 
+    @Override
+    public String toString() {
+        return "AbstractItem{" +
+                "id=" + id +
+                ", count=" + count +
+                ", sprite=" + sprite +
+                '}';
+    }
 }
