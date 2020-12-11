@@ -9,11 +9,11 @@ import lombok.*;
 @EqualsAndHashCode
 public class UDPFrame {
 
-    protected RarriateUDPFrameFactory udpFrameFactory;
+    protected UDPFrameFactory udpFrameFactory;
     protected int type;
     protected Object[] content;
 
-    public UDPFrame (RarriateUDPFrameFactory udpFrameFactory, int type, Object ... content){
+    public UDPFrame (UDPFrameFactory udpFrameFactory, int type, Object ... content){
         this.udpFrameFactory = udpFrameFactory;
         this.type = type;
         this.content = content;

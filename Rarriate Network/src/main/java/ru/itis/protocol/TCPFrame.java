@@ -9,11 +9,11 @@ import lombok.*;
 @EqualsAndHashCode
 public class TCPFrame {
 
-    protected RarriateTCPFrameFactory tcpFrameFactory;
+    protected TCPFrameFactory tcpFrameFactory;
     protected int type;
     protected Object[] content;
 
-    public TCPFrame (RarriateTCPFrameFactory tcpFrameFactory, int type, Object ... content){
+    public TCPFrame (TCPFrameFactory tcpFrameFactory, int type, Object ... content){
         this.tcpFrameFactory = tcpFrameFactory;
         this.type = type;
         this.content = content;

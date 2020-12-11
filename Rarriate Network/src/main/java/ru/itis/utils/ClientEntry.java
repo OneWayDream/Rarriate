@@ -1,6 +1,5 @@
 package ru.itis.utils;
 
-import ru.itis.entities.player.AbstractPlayer;
 
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
@@ -10,5 +9,4 @@ public interface ClientEntry {
     UUID getUuid();
     SocketChannel getSocketChannel();
     InetSocketAddress getDatagramAddress();
-    AbstractPlayer getPlayer();
 }

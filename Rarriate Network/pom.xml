@@ -30,14 +30,6 @@
             <version>1.18.12</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>ru.itis</groupId>
-            <artifactId>rarriate-client</artifactId>
-            <version>0.1 alpha</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/rarriate-client-0.1 alpha.jar</systemPath>
-        </dependency>
-
     </dependencies>
 
 
