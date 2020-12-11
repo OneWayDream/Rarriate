@@ -69,6 +69,7 @@ public class Player extends AbstractPlayer {
                 }
             }
         };
+        animation.setDaemon(true);
         animation.start();
     }
 }

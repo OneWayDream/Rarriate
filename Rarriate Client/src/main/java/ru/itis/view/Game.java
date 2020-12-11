@@ -7,6 +7,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import ru.itis.entities.Map;
 import ru.itis.entities.World;
@@ -17,15 +18,21 @@ import ru.itis.utils.FileLoader;
 import ru.itis.utils.MediaLoader;
 import ru.itis.utils.PropertiesLoader;
 import ru.itis.view.components.ModernButton;
+import ru.itis.view.components.ModernText;
 
-import java.awt.event.KeyListener;
+import java.util.Arrays;
 import java.util.List;
 
 public class Game {
 
+    protected static final int SPEED = 10;
+    protected static final int FALLING_SPEED = SPEED /2;
+    protected static final int MESSAGE_COUNT = 5;
+
     protected Stage mainStage;
     protected Scene mainScene;
     protected Pane mainPane;
+    protected ModernText chat;
 
     protected AbstractPlayer player;
 
@@ -37,8 +44,9 @@ public class Game {
 
     protected World world;
 
-    protected int speed = 10;
-    protected int fallingSpeed = speed/2;
+    protected String[] messages;
+    protected int fillMessages;
+
 
     protected boolean up;
     protected boolean down;
@@ -92,19 +100,25 @@ public class Game {
 
         timer.start();
         playGameBackgroundMusic();
+        setChat();
+
+        for (int i = 0; i < 30; i++) {
+            addChatMessage("ABCsdfdg " + i);
+        }
+
     }
 
     protected void update() {
-        if (up && player.getTranslateY() >= speed) {
+        if (up && player.getTranslateY() >= SPEED) {
             jumpPlayer(player);
         }
 
         if (left && player.getTranslateX() > 0) {
-            movePlayerX(-speed, player);
+            movePlayerX(-SPEED, player);
         }
 
         if (right && player.getTranslateX() + player.getWidth() <= mainScene.getWidth()) {
-            movePlayerX(speed, player);
+            movePlayerX(SPEED, player);
         }
 
         if (player.getVelocity().getY() < 10) {
@@ -241,6 +255,34 @@ public class Game {
         mediaPlayer = MediaLoader.getGameBackgroundMusic();
         mediaPlayer.setVolume(Integer.parseInt(PropertiesLoader.getInstance().getProperty("MUSIC_VOLUME")));
         mediaPlayer.play();
+    }
+
+    protected void setChat() {
+        messages = new String[MESSAGE_COUNT];
+        chat = new ModernText();
+
+        chat.setTranslateX(20);
+        chat.setTranslateY(mainScene.getHeight() - 200);
+        chat.setFill(Color.WHITE);
+        mainPane.getChildren().add(chat);
+    }
+
+    public void addChatMessage(String message) {
+        if (fillMessages < messages.length) {
+            chat.setText("");
+            messages[fillMessages] = message;
+            fillMessages++;
+            for (int j = 0; j < fillMessages; j++) {
+                chat.setText(chat.getText() + messages[j] + "\n");
+            }
+        } else {
+            chat.setText("");
+            messages = Arrays.copyOf(Arrays.copyOfRange(messages, 1, messages.length), messages.length);
+            messages[messages.length-1] = message;
+            for (String string : messages) {
+                chat.setText(chat.getText() + string + "\n");
+            }
+        }
     }
 
     protected void stopPlayingBackgroundMusic() {

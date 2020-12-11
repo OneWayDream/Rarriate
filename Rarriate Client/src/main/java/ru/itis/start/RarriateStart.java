@@ -5,6 +5,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import ru.itis.utils.FileLoader;
@@ -25,6 +26,7 @@ public class RarriateStart extends Application {
             ViewManager viewManager = new ViewManager(mainStage);
             viewManager.setMainMenuScene();
             mainStage.setFullScreenExitHint("");
+            mainStage.setFullScreenExitKeyCombination(KeyCombination.keyCombination("ALT+ENTER"));
             mainStage.show();
         } catch (Exception e){
             System.err.println(e.getMessage());

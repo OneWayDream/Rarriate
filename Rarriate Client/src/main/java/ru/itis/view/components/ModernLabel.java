@@ -16,6 +16,6 @@ public class ModernLabel extends Label {
     }
 
     private void setTextFont() {
-        setFont(FontLoader.getDefaultFont());
+        setFont(FontLoader.getDefaultFont(17));
     }
 }

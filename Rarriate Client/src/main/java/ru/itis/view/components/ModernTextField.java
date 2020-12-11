@@ -22,6 +22,6 @@ public class ModernTextField extends TextField {
 
 
     private void setFieldFont() {
-        setFont(FontLoader.getDefaultFont());
+        setFont(FontLoader.getDefaultFont(17));
     }
 }

@@ -24,7 +24,7 @@ public class ModernButton extends Button {
     }
 
     private void setButtonFont() {
-        setFont(FontLoader.getDefaultFont());
+        setFont(FontLoader.getDefaultFont(17));
     }
 
     private void setButtonDefaultStyle(){
