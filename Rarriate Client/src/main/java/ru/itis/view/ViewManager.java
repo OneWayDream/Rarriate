@@ -2,6 +2,7 @@ package ru.itis.view;
 
 import javafx.stage.Stage;
 import ru.itis.entities.World;
+import ru.itis.entities.player.implPlayers.Player;
 
 public class ViewManager {
     private Stage mainStage;
@@ -26,9 +27,9 @@ public class ViewManager {
         }
     }
 
-    public void setMultiPlayerScene(World world) {
+    public void setMultiPlayerScene(World world, Player player, int port) {
         boolean fullscreen = mainStage.isFullScreen();
-        mainStage.setScene(new Game(mainStage, this, world).getGameScene());
+        mainStage.setScene(new Game(mainStage, this, world, player, port).getGameScene());
         if (fullscreen){
             mainStage.setFullScreen(true);
         }

@@ -14,6 +14,7 @@ import ru.itis.RarriateApplication;
 import ru.itis.entities.Map;
 import ru.itis.entities.World;
 import ru.itis.entities.player.AbstractPlayer;
+import ru.itis.entities.player.implPlayers.Player;
 import ru.itis.utils.FileLoader;
 import ru.itis.utils.MediaLoader;
 import ru.itis.utils.PropertiesLoader;
@@ -231,8 +232,9 @@ public class MainMenu {
             @Override
             public void handle(MouseEvent event) {
                 World world = new World(new Map(), new ArrayList<AbstractPlayer>());
-                RarriateApplication.startServer(world);
-                viewManager.setMultiPlayerScene(world);
+                Player player = new Player();
+                int port = RarriateApplication.startServer(world, player);
+                viewManager.setMultiPlayerScene(world, player, port);
             }
         });
         mainPane.getChildren().add(startServer);

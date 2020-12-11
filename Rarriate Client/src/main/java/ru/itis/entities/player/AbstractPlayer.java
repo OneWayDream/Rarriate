@@ -4,21 +4,31 @@ import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import ru.itis.entities.Inventory;
+import ru.itis.entities.items.AbstractItem;
+import ru.itis.entities.items.implItems.StoneBlockItem;
+
+import java.io.Serializable;
+import java.util.List;
 
 
-public abstract class AbstractPlayer extends Rectangle{
-
-    protected String name;
-    protected static final double HEIGHT = 50;
-    protected static final double WIDTH = 50;
-    protected boolean canJump;
-    protected Point2D velocity;
-    protected Integer state;
+public abstract class AbstractPlayer extends Rectangle implements Serializable {
 
     public final static int IDLE = 0;
     public final static int RUN_RIGHT = 1;
     public final static int RUN_LEFT = 2;
     private final static int STATE_COUNT = 3;
+    protected static final double HEIGHT = 50;
+    protected static final double WIDTH = 50;
+    private final static int INVENTORY_COUNT = 10;
+
+    protected String name;
+
+    protected boolean canJump;
+    protected Point2D velocity;
+    protected Integer state;
+    protected Inventory inventory;
+
 
 
     public AbstractPlayer(String name) {
@@ -27,6 +37,12 @@ public abstract class AbstractPlayer extends Rectangle{
         canJump = true;
         velocity = new Point2D(0,0);
         state = 0;
+        inventory = new Inventory();
+        inventory.addItem(new StoneBlockItem());
+    }
+
+    public Inventory getInventory() {
+        return inventory;
     }
 
     public String getName() {

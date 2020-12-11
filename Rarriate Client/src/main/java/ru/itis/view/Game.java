@@ -3,6 +3,8 @@ package ru.itis.view;
 import javafx.animation.AnimationTimer;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -12,11 +14,13 @@ import javafx.stage.Stage;
 import ru.itis.entities.Map;
 import ru.itis.entities.World;
 import ru.itis.entities.blocks.Block;
+import ru.itis.entities.items.AbstractItem;
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.entities.player.implPlayers.Player;
 import ru.itis.utils.FileLoader;
 import ru.itis.utils.MediaLoader;
 import ru.itis.utils.PropertiesLoader;
+import ru.itis.utils.TextureLoader;
 import ru.itis.view.components.ModernButton;
 import ru.itis.view.components.ModernText;
 
@@ -47,6 +51,7 @@ public class Game {
     protected String[] messages;
     protected int fillMessages;
 
+    protected Integer port;
 
     protected boolean up;
     protected boolean down;
@@ -57,18 +62,20 @@ public class Game {
         createGUI(stage, viewManager);
     }
 
-    public Game(Stage stage, ViewManager viewManager, World world) {
+    public Game(Stage stage, ViewManager viewManager, World world, AbstractPlayer player, int port) {
+        this.player = player;
         this.world = world;
+        this.port = port;
         createGUI(stage, viewManager);
     }
 
     protected void createGUI(Stage stage, ViewManager viewManager) {
         mainStage = stage;
         this.viewManager = viewManager;
-            Pane pane = new Pane();
-            Scene scene = new Scene(pane, mainStage.getWidth(), mainStage.getHeight());
+        Pane pane = new Pane();
+        Scene scene = new Scene(pane, mainStage.getWidth(), mainStage.getHeight());
 
-            ModernButton exit = new ModernButton("EXIT");
+        ModernButton exit = new ModernButton("EXIT");
         exit.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
@@ -77,7 +84,9 @@ public class Game {
         });
         pane.getChildren().add(exit);
 
-        player = new Player();
+        if (player == null) {
+            player = new Player();
+        }
         player.setTranslateX((scene.getWidth() - player.getWidth())/2);
         player.setTranslateY((scene.getHeight() - player.getHeight())/2);
         pane.getChildren().add(player);
@@ -97,15 +106,14 @@ public class Game {
         mainPane = pane;
         setBackground();
         generateLevel();
-
+        setInventory();
         timer.start();
         playGameBackgroundMusic();
         setChat();
 
-        for (int i = 0; i < 30; i++) {
-            addChatMessage("ABCsdfdg " + i);
+        if (port != null) {
+            addChatMessage("Port: " + port);
         }
-
     }
 
     protected void update() {
@@ -237,6 +245,14 @@ public class Game {
             });
         }
     }
+
+    protected void setInventory() {
+        List<AbstractItem> items = player.getInventory().getItems();
+        items.get(0).setTranslateX(100);
+        items.get(0).setTranslateY(100);
+        mainPane.getChildren().add(items.get(0));
+    }
+
 
     protected void setBlock(Block block) {
         mainPane.getChildren().add(block);

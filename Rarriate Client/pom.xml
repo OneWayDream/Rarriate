@@ -32,6 +32,13 @@
       <scope>system</scope>
       <systemPath>${project.basedir}/lib/rarriate-network-0.1 alpha.jar</systemPath>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.12</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
