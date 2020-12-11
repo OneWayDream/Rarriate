@@ -92,7 +92,6 @@ public class Game {
         }
         player.setTranslateX((scene.getWidth() - player.getWidth())/2);
         player.setTranslateY((scene.getHeight() - player.getHeight())/2);
-//        velocity = new Point2D(0,0);
         pane.getChildren().add(player);
 
         scene.setOnKeyPressed(e -> processKey(e.getCode(), true));
@@ -251,10 +250,14 @@ public class Game {
     }
 
     protected void setInventory() {
-        List<AbstractItem> items = player.getInventory().getItems();
-        items.get(0).setTranslateX(100);
-        items.get(0).setTranslateY(100);
-        mainPane.getChildren().add(items.get(0));
+        ImageView inventorySprite = new ImageView(TextureLoader.getInventoryImage());
+        inventorySprite.setTranslateX(100);
+        inventorySprite.setTranslateY(100);
+        mainPane.getChildren().add(inventorySprite);
+//        List<AbstractItem> items = player.getInventory().getItems();
+//        items.get(0).setTranslateX(100);
+//        items.get(0).setTranslateY(100);
+//        mainPane.getChildren().add(items.get(0));
     }
 
 
