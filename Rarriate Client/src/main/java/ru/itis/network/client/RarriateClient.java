@@ -9,6 +9,7 @@ import ru.itis.client.AbstractClient;
 import ru.itis.entities.World;
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.exceptions.*;
+import ru.itis.network.dto.PlayerDto;
 import ru.itis.protocol.TCPFrame;
 import ru.itis.protocol.TCPFrameFactory;
 import ru.itis.protocol.UDPFrameFactory;
@@ -53,7 +54,7 @@ public class RarriateClient extends AbstractClient {
 
             UUID infoFrameId = UUID.randomUUID();
             TCPFrame clientInfoTCPFrame = tcpFrameFactory.createTCPFrame(1, infoFrameId,
-                    clientUDPAddress, player);
+                    clientUDPAddress, PlayerDto.from(player));
             tcpFrameFactory.writeTCPFrame(clientSocketChannel, clientInfoTCPFrame);
 
             System.out.println("Успешно отправил пакет с информацией о себе");

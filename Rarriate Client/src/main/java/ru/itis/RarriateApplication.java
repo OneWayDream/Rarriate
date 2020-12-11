@@ -50,28 +50,32 @@ public class RarriateApplication {
         InetSocketAddress serverTCPAddress = getUniqueAddress();
         InetSocketAddress serverUDPAddress = getUniqueAddress();
 
-        Runnable serverThread = () -> {
+        Runnable serverRun = () -> {
             try {
                 server.start(serverTCPAddress, serverUDPAddress);
             } catch (ServerException ex) {
                 throw new ServerWorkException(ex.getMessage(), ex);
             }
         };
-        new Thread(serverThread).start();
+        Thread serverThread = new Thread(serverRun);
+        serverThread.setDaemon(true);
+        serverThread.start();
         client = RarriateClient.init(new RarriateClientKeyManager(),
                 new RarriateUDPFrameFactory((byte) 0xAA, (byte) 0xBB, 2048, 64, 0),
                 new RarriateTCPFrameFactory((byte) 0XCC, (byte) 0xDD, 2048, 64, 0),
                 player
         );
         InetSocketAddress clientUDPAddress = getUniqueAddress();
-        Runnable clientThread = () -> {
+        Runnable clientRun = () -> {
             try {
                 client.connect(serverTCPAddress, clientUDPAddress);
             } catch (ClientException ex) {
                 throw new ClientWorkException(ex.getMessage(), ex);
             }
         };
-        new Thread(clientThread).start();
+        Thread clientThread = new Thread(clientRun);
+        clientThread.setDaemon(true);
+        clientThread.start();
         return serverTCPAddress.getPort();
     }
 
