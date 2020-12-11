@@ -4,7 +4,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import ru.itis.utils.FileLoader;
 
-public abstract class AbstractItem extends ImageView {
+import java.io.Serializable;
+
+public abstract class AbstractItem extends ImageView implements Serializable {
     protected final static int WIDTH = 32;
     protected final static int HEIGHT = 32;
 

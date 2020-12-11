@@ -3,10 +3,11 @@ package ru.itis.entities;
 import ru.itis.entities.blocks.Block;
 import ru.itis.entities.blocks.implBlocks.DirtBlock;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Map {
+public class Map implements Serializable {
     private List<Block> blocks;
 
     public Map() {

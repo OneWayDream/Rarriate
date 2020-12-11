@@ -3,9 +3,10 @@ package ru.itis.entities;
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.entities.player.implPlayers.Player;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class World {
+public class World implements Serializable {
     private Map map;
     private List<AbstractPlayer> players;
 
