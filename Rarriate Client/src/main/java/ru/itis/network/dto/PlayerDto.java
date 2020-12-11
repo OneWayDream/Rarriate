@@ -36,8 +36,13 @@ public class PlayerDto implements Serializable {
     }
 
     public static AbstractPlayer to (PlayerDto playerDto){
-//        return new Player(playerDto.getName());
-        return null;
+        return new Player(playerDto.getName());
+    }
+
+    public static List<AbstractPlayer> to (List<PlayerDto> playerDtos){
+        return playerDtos.stream()
+                .map(PlayerDto::to)
+                .collect(Collectors.toList());
     }
 
 }

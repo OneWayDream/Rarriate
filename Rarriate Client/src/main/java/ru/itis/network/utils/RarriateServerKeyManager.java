@@ -2,6 +2,7 @@ package ru.itis.network.utils;
 
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.exceptions.*;
+import ru.itis.network.dto.PlayerDto;
 import ru.itis.network.server.RarriateServer;
 import ru.itis.protocol.TCPFrame;
 import ru.itis.protocol.UDPFrame;
@@ -36,7 +37,7 @@ public class RarriateServerKeyManager implements ServerKeyManager {
             if (tcpFrame!=null){
                 if (tcpFrame.getType()==1){
                     Object[] userData = tcpFrame.getContent();
-                    AbstractPlayer player = (AbstractPlayer) userData[2];
+                    AbstractPlayer player = PlayerDto.to((PlayerDto) userData[2]);
                     boolean isUniqueNickname = true;
                     for (ClientEntry clientEntry: server.getClientSet()) {
                         if (((RarriateClientEntry)clientEntry).getPlayer().getName().equals(player.getName())){

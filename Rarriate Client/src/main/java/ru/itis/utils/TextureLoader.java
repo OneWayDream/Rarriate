@@ -96,8 +96,8 @@ public class TextureLoader {
             //TODO return inventory.png
             return new Image(Objects.requireNonNull(TextureLoader.class
                     .getClassLoader()
-//                    .getResourceAsStream("img/Rarriate-ico.png")));
-                    .getResourceAsStream("img/inventory.png")));
+                    .getResourceAsStream("img/Rarriate-icon.png")));
+                    //.getResourceAsStream("img/inventory.png")));
         } catch (NullPointerException e) {
             RarriateStart.showError(new ImageFileNotFoundException("Can't find inventory.png file", e));
         }

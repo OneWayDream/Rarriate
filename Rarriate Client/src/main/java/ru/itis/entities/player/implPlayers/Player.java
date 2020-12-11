@@ -22,6 +22,14 @@ public class Player extends AbstractPlayer {
         startAnimation();
     }
 
+    public Player(String name){
+        super(name);
+        runRightImages = TextureLoader.getPlayer1SpriteRight();
+        runLeftImages = TextureLoader.getPlayer1SpriteLeft();
+        idleImages = TextureLoader.getPlayer1SpriteIdle();
+        startAnimation();
+    }
+
     @Override
     protected void startAnimation() {
         Thread animation = new Thread() {
