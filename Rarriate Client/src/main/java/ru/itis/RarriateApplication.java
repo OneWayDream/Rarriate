@@ -1,19 +1,18 @@
 package ru.itis;
 
-import ru.itis.client.Client;
-import ru.itis.client.SocketClient;
 import ru.itis.entities.World;
+import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.exceptions.ClientException;
 import ru.itis.exceptions.ClientWorkException;
 import ru.itis.exceptions.ServerException;
 import ru.itis.exceptions.ServerWorkException;
-import ru.itis.protocol.RarriateTCPFrameFactory;
-import ru.itis.protocol.RarriateUDPFrameFactory;
-import ru.itis.server.Server;
-import ru.itis.server.SocketServer;
+import ru.itis.network.client.RarriateClient;
+import ru.itis.network.protocol.RarriateTCPFrameFactory;
+import ru.itis.network.protocol.RarriateUDPFrameFactory;
+import ru.itis.network.server.RarriateServer;
+import ru.itis.network.utils.RarriateClientKeyManager;
+import ru.itis.network.utils.RarriateServerKeyManager;
 import ru.itis.start.RarriateStart;
-import ru.itis.utils.RarriateClientKeyManager;
-import ru.itis.utils.RarriateServerKeyManager;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -25,14 +24,14 @@ public class RarriateApplication {
     protected static int minPortValue = 5000;
     protected static int maxPortValue = 5100;
 
-    protected static Client client;
-    protected static Server server;
+    protected static RarriateClient client;
+    protected static RarriateServer server;
 
-    public static Client getClient() {
+    public static RarriateClient getClient() {
         return client;
     }
 
-    public static Server getServer() {
+    public static RarriateServer getServer() {
         return server;
     }
 
@@ -40,8 +39,8 @@ public class RarriateApplication {
         RarriateStart.main(args);
     }
 
-    public static void startServer(World world){
-        server = SocketServer.init(new RarriateServerKeyManager(),
+    public static int startServer(World world, AbstractPlayer player){
+        server = RarriateServer.init(new RarriateServerKeyManager(),
                 new RarriateUDPFrameFactory((byte) 0xAA, (byte) 0xBB, 2048, 64, 0),
                 new RarriateTCPFrameFactory((byte) 0XCC, (byte) 0xDD, 2048, 64, 0),
                 world
@@ -58,20 +57,21 @@ public class RarriateApplication {
             }
         };
         new Thread(serverThread).start();
-        client = SocketClient.init(new RarriateClientKeyManager(),
+        client = RarriateClient.init(new RarriateClientKeyManager(),
                 new RarriateUDPFrameFactory((byte) 0xAA, (byte) 0xBB, 2048, 64, 0),
-                new RarriateTCPFrameFactory((byte) 0XCC, (byte) 0xDD, 2048, 64, 0)
+                new RarriateTCPFrameFactory((byte) 0XCC, (byte) 0xDD, 2048, 64, 0),
+                player
         );
         InetSocketAddress clientUDPAddress = getUniqueAddress();
         Runnable clientThread = () -> {
-            //TODO set player data
             try {
-                client.connect(serverTCPAddress, clientUDPAddress, null);
+                client.connect(serverTCPAddress, clientUDPAddress);
             } catch (ClientException ex) {
                 throw new ClientWorkException(ex.getMessage(), ex);
             }
         };
-        new Thread(serverThread).start();
+        new Thread(clientThread).start();
+        return serverTCPAddress.getPort();
     }
 
     public static void connectToServer(){
