@@ -36,6 +36,7 @@ public class RarriateApplication {
     }
 
     public static void main(String[] args) {
+        counter = minPortValue;
         RarriateStart.main(args);
     }
 
@@ -74,13 +75,21 @@ public class RarriateApplication {
         return serverTCPAddress.getPort();
     }
 
-    public static void connectToServer(){
+    public static void connectToServer(InetSocketAddress serverAddress, AbstractPlayer player){
+
+
+        client = RarriateClient.init(new RarriateClientKeyManager(),
+                new RarriateUDPFrameFactory((byte) 0xAA, (byte) 0xBB, 2048, 64, 0),
+                new RarriateTCPFrameFactory((byte) 0XCC, (byte) 0xDD, 2048, 64, 0),
+                player
+        );
 
     }
 
+    protected static int counter;
+
     private static InetSocketAddress getUniqueAddress(){
         InetSocketAddress result = null;
-        int counter = minPortValue;
         while ((result==null)&&(counter<=maxPortValue)){
             try{
                 SocketChannel socketChannel = SocketChannel.open(new InetSocketAddress("localhost", counter));
