@@ -1,6 +1,5 @@
 package ru.itis.entities.player.implPlayers;
 
-import javafx.animation.AnimationTimer;
 import javafx.scene.image.Image;
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.utils.PropertiesLoader;
@@ -20,7 +19,6 @@ public class Player extends AbstractPlayer {
         runLeftImages = TextureLoader.getPlayer1SpriteLeft();
         idleImages = TextureLoader.getPlayer1SpriteIdle();
 
-//        fillPlayer(TextureLoader.getPlayer1Texture());
         startAnimation();
     }
 

@@ -1,6 +1,5 @@
 package ru.itis.entities.player;
 
-import javafx.animation.AnimationTimer;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
@@ -28,6 +27,10 @@ public abstract class AbstractPlayer extends Rectangle{
         canJump = true;
         velocity = new Point2D(0,0);
         state = 0;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Point2D getVelocity() {

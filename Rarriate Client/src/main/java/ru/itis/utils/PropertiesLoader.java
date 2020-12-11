@@ -52,6 +52,9 @@ public class PropertiesLoader {
     }
 
     private void createProperties() throws IOException{
+        if (!Files.exists(Paths.get(FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\Rarriate!"))) {
+            Files.createDirectory(Paths.get(FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\Rarriate!"));
+        }
         Files.createFile(Paths.get(path));
         properties.load(new FileInputStream(new File(path)));
 
