@@ -231,7 +231,7 @@ public class MainMenu {
         startServer.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                World world = new World(new Map(), new ArrayList<AbstractPlayer>());
+                World world = new World(new Map(mainScene.getHeight()), new ArrayList<AbstractPlayer>());
                 Player player = new Player();
                 int port = RarriateApplication.startServer(world, player);
                 viewManager.setMultiPlayerScene(world, player, port);

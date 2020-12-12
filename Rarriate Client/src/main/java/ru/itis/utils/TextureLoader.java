@@ -112,4 +112,15 @@ public class TextureLoader {
         }
         return null;
     }
+
+    public static Image getBedrockTexture() {
+        try {
+            return new Image(Objects.requireNonNull(TextureLoader.class
+                    .getClassLoader()
+                    .getResourceAsStream("img/blocks/bedrock_block.png")));
+        } catch (NullPointerException e) {
+            RarriateStart.showError(new ImageFileNotFoundException("Can't find bedrock_block.png file", e));
+        }
+        return null;
+    }
 }

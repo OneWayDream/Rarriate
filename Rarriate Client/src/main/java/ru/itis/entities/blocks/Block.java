@@ -11,13 +11,21 @@ import javafx.scene.shape.Rectangle;
 import java.io.InputStream;
 
 public abstract class Block extends Rectangle {
+
+    public static final double HEIGHT = 50;
+    public static final double WIDTH = 50;
+
     protected int id;
-    protected static final double HEIGHT = 50;
-    protected static final double WIDTH = 50;
+    protected boolean breakable;
 
     public Block(){
         super(WIDTH, HEIGHT);
+        breakable = true;
         id = -1;
+    }
+
+    public boolean isBreakable() {
+        return breakable;
     }
 
     public int getBlockId() {

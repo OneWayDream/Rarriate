@@ -1,7 +1,9 @@
 package ru.itis.view;
 
 import javafx.animation.AnimationTimer;
+import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.geometry.Point2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -15,7 +17,9 @@ import javafx.stage.Stage;
 import ru.itis.entities.Map;
 import ru.itis.entities.World;
 import ru.itis.entities.blocks.Block;
+import ru.itis.entities.blocks.implBlocks.DirtBlock;
 import ru.itis.entities.blocks.implBlocks.GrassBlock;
+import ru.itis.entities.blocks.implBlocks.StoneBlock;
 import ru.itis.entities.items.AbstractItem;
 import ru.itis.entities.items.implItems.DirtBlockItem;
 import ru.itis.entities.items.implItems.GrassBlockItem;
@@ -112,6 +116,25 @@ public class Game {
         if (port != null) {
             addChatMessage("Port: " + port);
         }
+
+        mainScene.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                boolean isBlock;
+                for (Block block: blocks) {
+                    if (Math.abs(player.getTranslateX() - block.getTranslateX()) <= 150 &&
+                            Math.abs(player.getTranslateY() - block.getTranslateY()) <= 150) {
+                        if (block.getBoundsInParent().intersects(event.getX(), event.getY(), 1, 1)) {
+                            if (block.isBreakable()) {
+                                removeBlockAndAddToInventory(block);
+                            }
+                            return;
+                        }
+                    }
+                }
+                setBlockFromInventory(event.getX(), event.getY());
+            }
+        });
     }
 
     protected void update() {
@@ -224,24 +247,31 @@ public class Game {
 
     protected void generateLevel() {
         if (world == null) {
-            world = new World(new Map(), null);
+            world = new World(new Map(mainScene.getHeight()), null);
         }
         blocks = world.getMap().getBlocks();
 
         for (Block block: blocks) {
             setBlock(block);
-            block.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    if(Math.abs(player.getTranslateX() - block.getTranslateX()) <= 150 &&
-                        Math.abs(player.getTranslateY() - block.getTranslateY()) <= 150){
-                        mainPane.getChildren().remove(block);
-                        blocks.remove(block);
-                        player.getInventory().addItem(getItemFromBlock(block));
-                        updateInventory();
-                    }
-                }
-            });
+        }
+    }
+
+    protected void removeBlockAndAddToInventory(Block block) {
+        player.getInventory().addItem(getItemFromBlock(block));
+        mainPane.getChildren().remove(block);
+        blocks.remove(block);
+        updateInventory();
+    }
+
+    protected void setBlockFromInventory(double x, double y) {
+        if (player.getInventory().getItems().size() > 0) {
+            Block block = getBlockFromItem(player.getInventory().getItems().get(0));
+            player.getInventory().getItems().remove(0);
+            block.setTranslateX(x - (x % Block.WIDTH));
+            block.setTranslateY(y - (y % Block.HEIGHT));
+            blocks.add(block);
+            setBlock(block);
+            updateInventory();
         }
     }
 
@@ -285,6 +315,19 @@ public class Game {
                 return new DirtBlockItem();
             case 3:
                 return new GrassBlockItem();
+            default:
+                return null;
+        }
+    }
+
+    protected Block getBlockFromItem(AbstractItem item) {
+        switch (item.getItemId()) {
+            case 1:
+                return new StoneBlock();
+            case 2:
+                return new DirtBlock();
+            case 3:
+                return new GrassBlock();
             default:
                 return null;
         }
