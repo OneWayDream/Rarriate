@@ -135,21 +135,32 @@ public class RarriateServerKeyManager implements ServerKeyManager {
                     for (ClientEntry clientEntry: server.getClientSet()){
                         if (clientEntry.getUuid().equals(clientUUID)){
                             client = clientEntry;
+                            break;
                         }
                     }
-                    switch (receivedUDPFrame.getType()){
-                        //TODO обработка UDP - пакетов
-                        case 0:
-                            int moveX = (int) messageContent[1];
-                            int moveY = (int) messageContent[2];
-
-                            break;
+                    if (client!=null){
+                        switch (receivedUDPFrame.getType()){
+                            case 0:
+                                int moveX = (int) messageContent[1];
+                                int moveY = (int) messageContent[2];
+                                server.sendBroadcastUDP(
+                                        server.getUdpFrameFactory().createUDPFrame(
+                                                1,
+                                                ((RarriateClientEntry) client).getPlayer().getName(),
+                                                moveX, moveY
+                                        ),
+                                        client.getDatagramAddress()
+                                );
+                                break;
+                        }
                     }
                 }
             } catch (UDPFrameFactoryException ex) {
                 throw new KeyManagerException(ex.getMessage(), ex);
             } catch (IncorrectFCSException ex){
                 //ignore
+            } catch (ServerException ex){
+                throw new KeyManagerException("Cannot send broadcast to other users", ex);
             }
         } else {
             try{

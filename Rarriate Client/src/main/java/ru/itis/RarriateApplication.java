@@ -97,7 +97,11 @@ public class RarriateApplication {
         };
         Thread clientThread = new Thread(clientRun);
         clientThread.setDaemon(true);
-        clientThread.start();
+        try{
+            clientThread.start();
+        } catch (ClientWorkException ex){
+            RarriateStart.main(null);
+        }
 
         return client.getWorld();
 

@@ -6,7 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.itis.entities.blocks.Block;
+import ru.itis.entities.blocks.implBlocks.BedrockBlock;
 import ru.itis.entities.blocks.implBlocks.DirtBlock;
+import ru.itis.entities.blocks.implBlocks.StoneBlock;
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.entities.player.implPlayers.Player;
 
@@ -29,6 +31,10 @@ public class BlockDto implements Serializable {
         int blockType = - 1;
         if (block instanceof DirtBlock){
             blockType = 0;
+        } else if (block instanceof StoneBlock){
+            blockType = 1;
+        } else if (block instanceof BedrockBlock){
+            blockType = 2;
         }
         return BlockDto.builder()
                 .coordX(block.getTranslateX())
@@ -46,11 +52,19 @@ public class BlockDto implements Serializable {
     public static Block to (BlockDto blockDto){
         Block result;
         switch (blockDto.getType()){
-            case 1:
+            case 0:
                 result = new DirtBlock();
                 result.setTranslateX(blockDto.getCoordY());
                 result.setTranslateY(blockDto.getCoordX());
                 break;
+            case 1:
+                result = new StoneBlock();
+                result.setTranslateX(blockDto.getCoordY());
+                result.setTranslateY(blockDto.getCoordX());
+            case 2:
+                result = new BedrockBlock();
+                result.setTranslateX(blockDto.getCoordY());
+                result.setTranslateY(blockDto.getCoordX());
             default:
                 result = null;
                 break;

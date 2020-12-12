@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.itis.entities.Map;
 import ru.itis.entities.World;
-import ru.itis.entities.player.AbstractPlayer;
 
 import java.io.Serializable;
 import java.util.List;
