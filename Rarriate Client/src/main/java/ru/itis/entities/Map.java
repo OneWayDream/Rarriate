@@ -16,6 +16,10 @@ public class Map implements Serializable {
         generateBlocks();
     }
 
+    public Map(List<Block> blocks) {
+        this.blocks = blocks;
+    }
+
     public List<Block> getBlocks () {
         return blocks;
     }
