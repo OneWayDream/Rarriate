@@ -79,14 +79,27 @@ public class RarriateApplication {
         return serverTCPAddress.getPort();
     }
 
-    public static void connectToServer(InetSocketAddress serverAddress, AbstractPlayer player){
-
+    public static World connectToServer(InetSocketAddress serverAddress, AbstractPlayer player){
 
         client = RarriateClient.init(new RarriateClientKeyManager(),
                 new RarriateUDPFrameFactory((byte) 0xAA, (byte) 0xBB, 2048, 64, 0),
                 new RarriateTCPFrameFactory((byte) 0XCC, (byte) 0xDD, 2048, 64, 0),
                 player
         );
+
+        InetSocketAddress clientUDPAddress = getUniqueAddress();
+        Runnable clientRun = () -> {
+            try {
+                client.connect(serverAddress, clientUDPAddress);
+            } catch (ClientException ex) {
+                throw new ClientWorkException(ex.getMessage(), ex);
+            }
+        };
+        Thread clientThread = new Thread(clientRun);
+        clientThread.setDaemon(true);
+        clientThread.start();
+
+        return client.getWorld();
 
     }
 
