@@ -90,15 +90,6 @@ public class RarriateApplication {
 
     }
 
-    public void disconnect(){
-        if (server!=null){
-            server.stop();
-        }
-        if (client!=null){
-            client.disconnect();
-        }
-    }
-
     protected static int counter;
 
     private static InetSocketAddress getUniqueAddress(){
