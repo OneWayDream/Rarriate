@@ -12,6 +12,7 @@ import javafx.scene.layout.*;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import ru.itis.RarriateApplication;
 import ru.itis.entities.Map;
 import ru.itis.entities.World;
 import ru.itis.entities.blocks.Block;
@@ -111,11 +112,18 @@ public class Game {
     }
 
     protected void addEscKeyListener() {
+        boolean isEscaped = false;
         mainScene.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-
+            Pane escapePane = new Pane();
+//            Scene escapeScene = new Scene(escapePane, mainScene.getWidth(), mainScene.getHeight());
             @Override
             public void handle(KeyEvent event) {
                 if (event.getCode() == KeyCode.ESCAPE) {
+                    if (mainPane.getChildren().contains(escapePane)) {
+
+                    }
+                    escapePane.setBackground(new Background(FileLoader.getEscapeBackground()));
+                    mainPane.getChildren().add(escapePane);
                     addChatMessage("YOU PRESSED ESCAPE");
                 }
             }
@@ -356,6 +364,9 @@ public class Game {
         exit.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                if (port != null) {
+                    RarriateApplication.disconnect();
+                }
                 exitToMainMenu();
             }
         });

@@ -46,6 +46,18 @@ public class FileLoader {
         }
         return null;
     }
+
+    public static BackgroundImage getEscapeBackground() {
+        try {
+            InputStream is = FileLoader.class.getClassLoader().getResourceAsStream("img/escape_background.png");
+            Image backgroundImage = new Image(is);
+            return new BackgroundImage(backgroundImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, null);
+        } catch (NullPointerException e){
+            RarriateStart.showError(new ImageFileNotFoundException("Can't find escape_background.png file", e));
+        }
+        return null;
+    }
+
     public static BackgroundImage getChatBackground() {
         try {
             InputStream is = FileLoader.class.getClassLoader().getResourceAsStream("img/components/transparent_text_area.png");
