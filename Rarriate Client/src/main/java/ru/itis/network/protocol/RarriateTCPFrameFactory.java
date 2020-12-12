@@ -118,6 +118,9 @@ public class RarriateTCPFrameFactory implements TCPFrameFactory {
             OutputStream out = serverTCPSocket.socket().getOutputStream();
             out.write(pr);
             out.write(sdf);
+
+            System.out.println(tcpFrame.getType());
+
             out.write(tcpFrame.getType());
 
             ByteBuffer byteBuffer = ByteBuffer.allocate(2);

@@ -16,6 +16,22 @@ public class RarriateClientKeyManager implements ClientKeyManager {
     public void read(AbstractClient client, SelectionKey key) throws KeyManagerException, ClientDisconnectException {
         if (client.getClientSocketChannel().equals(key.channel())){
             try{
+                TCPFrame tcpFrame = client.getTcpFrameFactory().readTCPFrame(client.getClientSocketChannel());
+
+                System.out.println("Получил пакет, а вообще не должен -_-");
+
+                switch (tcpFrame.getType()){
+                    //TODO обработка TCP - пакетов
+                }
+            } catch (TCPFrameFactoryException ex) {
+                throw new KeyManagerException(ex.getMessage(), ex);
+            } catch (IncorrectFCSException ex) {
+                //TODO reaction on incorrect frame
+            } catch (IllegalBlockingModeException ex){
+                throw new ClientDisconnectException(key);
+            }
+        } else {
+            try{
                 UDPFrame receivedUDPFrame = client.getUdpFrameFactory().readUDPFrame((DatagramChannel) key.channel());
                 if (receivedUDPFrame!=null){
                     switch (receivedUDPFrame.getType()){
@@ -26,19 +42,6 @@ public class RarriateClientKeyManager implements ClientKeyManager {
                 throw new KeyManagerException(ex.getMessage(), ex);
             } catch (IncorrectFCSException ex){
                 //ignore
-            }
-        } else {
-            try{
-                TCPFrame tcpFrame = client.getTcpFrameFactory().readTCPFrame(client.getClientSocketChannel());
-                switch (tcpFrame.getType()){
-                    //TODO обработка TCP - пакетов
-                }
-            } catch (TCPFrameFactoryException ex) {
-                throw new KeyManagerException(ex.getMessage(), ex);
-            } catch (IncorrectFCSException ex) {
-                //TODO reaction on incorrect frame
-            }catch (IllegalBlockingModeException ex){
-                throw new ClientDisconnectException(key);
             }
         }
     }

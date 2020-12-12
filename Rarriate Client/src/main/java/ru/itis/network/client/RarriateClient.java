@@ -10,6 +10,7 @@ import ru.itis.entities.World;
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.exceptions.*;
 import ru.itis.network.dto.PlayerDto;
+import ru.itis.network.dto.WorldDto;
 import ru.itis.protocol.TCPFrame;
 import ru.itis.protocol.TCPFrameFactory;
 import ru.itis.protocol.UDPFrameFactory;
@@ -62,11 +63,11 @@ public class RarriateClient extends AbstractClient {
             TCPFrame serverResponseFrame = tcpFrameFactory.readTCPFrame(clientSocketChannel);
 
             System.out.println("Получил пакет с инфой о сервере");
-            if (serverResponseFrame.getType() == 2){
+            if ((serverResponseFrame!=null)&&(serverResponseFrame.getType() == 2)){
                 clientUuid = (UUID) serverResponseFrame.getContent()[1];
                 serverUDPAddress = (InetSocketAddress) serverResponseFrame.getContent()[2];
                 serverUuid = (UUID) serverResponseFrame.getContent()[3];
-                world = (World) serverResponseFrame.getContent()[4];
+                world = WorldDto.to((WorldDto) serverResponseFrame.getContent()[4]);
 
                 System.out.println("Донастроился");
 
@@ -97,8 +98,9 @@ public class RarriateClient extends AbstractClient {
                     }
                 }
             } else {
+                System.out.println("Пакет неверен");
                 clientSocketChannel.close();
-                if (serverResponseFrame.getType() == 3){
+                if ((serverResponseFrame!=null)&&(serverResponseFrame.getType() == 3)){
                     throw new AlreadyRegisteredNameException();
                 }
             }
@@ -115,12 +117,13 @@ public class RarriateClient extends AbstractClient {
             try{
                 clientUDPChannel.close();
                 clientSocketChannel.close();
+                selector.close();
             } catch (IOException exx){
                 //ignore
             }
             System.out.println("Сервер отключился(");
         } catch (ClosedSelectorException ex){
-            System.out.println("Сервер успешно отключился");
+            System.out.println("Клиент успешно отключился");
         }
     }
 }

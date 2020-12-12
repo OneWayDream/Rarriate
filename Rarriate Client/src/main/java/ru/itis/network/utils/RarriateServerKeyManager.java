@@ -3,11 +3,13 @@ package ru.itis.network.utils;
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.exceptions.*;
 import ru.itis.network.dto.PlayerDto;
+import ru.itis.network.dto.WorldDto;
 import ru.itis.network.server.RarriateServer;
 import ru.itis.protocol.TCPFrame;
 import ru.itis.protocol.UDPFrame;
 import ru.itis.server.AbstractServer;
 import ru.itis.utils.ClientEntry;
+import ru.itis.utils.Player;
 import ru.itis.utils.ServerKeyManager;
 
 import java.io.IOException;
@@ -64,13 +66,14 @@ public class RarriateServerKeyManager implements ServerKeyManager {
                         UUID responseFrameId = UUID.randomUUID();
                         TCPFrame tcpFrameResponse = server.getTcpFrameFactory().createTCPFrame(2,
                                 responseFrameId, clientUUID, server.getServerUDPChannel().getLocalAddress(),
-                                server.getServerUuid(), ((RarriateServer) server).getWorld());
+                                server.getServerUuid(), WorldDto.from(((RarriateServer) server).getWorld()));
+                        System.out.println("Отправляю пакет с настройками");
                         server.getTcpFrameFactory().writeTCPFrame(client, tcpFrameResponse);
 
                         System.out.println("Отправил пакет с настройками");
 
                         ClientEntry clientEntry = RarriateClientEntry.builder()
-                                .player((AbstractPlayer) userData[2])
+                                .player(PlayerDto.to((PlayerDto) userData[2]))
                                 .uuid(clientUUID)
                                 .datagramAddress((InetSocketAddress) userData[1])
                                 .socketChannel(client)
@@ -81,7 +84,9 @@ public class RarriateServerKeyManager implements ServerKeyManager {
                         ((RarriateServer) server).getWorld().getPlayers().add(player);
 
                         server.sendBroadcastTCP(
-                                server.getTcpFrameFactory().createTCPFrame(4, clientNotification, player)
+                                server.getTcpFrameFactory().createTCPFrame(4,
+                                        clientNotification, PlayerDto.from(player)),
+                                client
                         );
 
 
