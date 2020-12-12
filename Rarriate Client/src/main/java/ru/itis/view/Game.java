@@ -90,7 +90,6 @@ public class Game {
         setBackground();
         generateLevel();
         createPlayer();
-        createExitToMainMenuButton();
         setInventory();
         playGameBackgroundMusic();
         setChat();
@@ -112,19 +111,22 @@ public class Game {
     }
 
     protected void addEscKeyListener() {
-        boolean isEscaped = false;
+        Pane escapePane = new Pane();
+        escapePane.setBackground(new Background(FileLoader.getEscapeBackground()));
+        escapePane.setPrefSize(mainStage.getWidth(),mainStage.getHeight());
+        ModernButton exit = createExitToMainMenuButton();
+        exit.setTranslateX((mainStage.getWidth()-200)/2);
+        exit.setTranslateY((mainStage.getHeight()-60)/2);
+        escapePane.getChildren().add(exit);
         mainScene.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-            Pane escapePane = new Pane();
-//            Scene escapeScene = new Scene(escapePane, mainScene.getWidth(), mainScene.getHeight());
             @Override
             public void handle(KeyEvent event) {
                 if (event.getCode() == KeyCode.ESCAPE) {
                     if (mainPane.getChildren().contains(escapePane)) {
-
+                        mainPane.getChildren().remove(escapePane);
+                    } else {
+                        mainPane.getChildren().add(escapePane);
                     }
-                    escapePane.setBackground(new Background(FileLoader.getEscapeBackground()));
-                    mainPane.getChildren().add(escapePane);
-                    addChatMessage("YOU PRESSED ESCAPE");
                 }
             }
         });
@@ -359,7 +361,7 @@ public class Game {
         }
     }
 
-    protected void createExitToMainMenuButton() {
+    protected ModernButton createExitToMainMenuButton() {
         ModernButton exit = new ModernButton("EXIT");
         exit.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -370,9 +372,7 @@ public class Game {
                 exitToMainMenu();
             }
         });
-        exit.setTranslateX(mainScene.getWidth() - 200);
-        exit.setTranslateY(mainScene.getHeight() - 60);
-        mainPane.getChildren().add(exit);
+        return exit;
     }
 
     protected void setBlock(Block block) {

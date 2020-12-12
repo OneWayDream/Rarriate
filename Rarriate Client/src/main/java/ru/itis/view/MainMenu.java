@@ -11,6 +11,7 @@ import javafx.scene.layout.*;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import ru.itis.RarriateApplication;
+import ru.itis.entities.Inventory;
 import ru.itis.entities.Map;
 import ru.itis.entities.World;
 import ru.itis.entities.player.AbstractPlayer;
@@ -23,6 +24,7 @@ import ru.itis.view.components.ModernLabel;
 import ru.itis.view.components.ModernTextField;
 
 import java.io.InputStream;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 
 public class MainMenu {
@@ -41,6 +43,8 @@ public class MainMenu {
     private ViewManager viewManager;
 
     private ModernTextField nameField;
+    private ModernTextField ipField;
+    private ModernTextField portField;
 
     public MainMenu(Stage stage, ViewManager viewManager){
         mainStage = stage;
@@ -208,7 +212,7 @@ public class MainMenu {
     private void createIPField() {
         ModernLabel ipLabel = new ModernLabel("IP:");
         VBox.setMargin(ipLabel, new Insets(0,0,-25,0));
-        ModernTextField ipField = new ModernTextField();
+        ipField = new ModernTextField();
         ipField.setMaxWidth(190);
         mainPane.getChildren().addAll(ipLabel, ipField);
     }
@@ -216,13 +220,22 @@ public class MainMenu {
     private void createPortField() {
         ModernLabel portLabel = new ModernLabel("Port:");
         VBox.setMargin(portLabel, new Insets(0,0,-25,0));
-        ModernTextField portField = new ModernTextField();
+        portField = new ModernTextField();
         portField.setMaxWidth(190);
         mainPane.getChildren().addAll(portLabel, portField);
     }
 
     private void createEnterMultiPlayerConnectButton() {
         ModernButton enter = new ModernButton("Enter");
+        enter.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                int port = Integer.parseInt(portField.getText());
+                Player player = new Player();
+                World world = RarriateApplication.connectToServer(new InetSocketAddress(ipField.getText(), port), player);
+                viewManager.setMultiPlayerScene(world, player, port);
+            }
+        });
         mainPane.getChildren().add(enter);
     }
 
