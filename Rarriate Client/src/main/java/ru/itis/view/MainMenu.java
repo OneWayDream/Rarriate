@@ -230,6 +230,7 @@ public class MainMenu {
         enter.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                saveName();
                 int port = Integer.parseInt(portField.getText());
                 Player player = new Player();
                 World world = RarriateApplication.connectToServer(new InetSocketAddress(ipField.getText(), port), player);
@@ -244,6 +245,7 @@ public class MainMenu {
         startServer.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                saveName();
                 World world = new World(new Map(mainScene.getHeight()), new ArrayList<AbstractPlayer>());
                 Player player = new Player();
                 int port = RarriateApplication.startServer(world, player);
