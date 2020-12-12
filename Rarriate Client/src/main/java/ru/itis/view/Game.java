@@ -3,12 +3,10 @@ package ru.itis.view;
 import javafx.animation.AnimationTimer;
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
-import javafx.geometry.Point2D;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.MediaPlayer;
@@ -82,18 +80,21 @@ public class Game {
     protected void createGUI(Stage stage, ViewManager viewManager) {
         mainStage = stage;
         this.viewManager = viewManager;
-        Pane pane = new Pane();
-        Scene scene = new Scene(pane, mainStage.getWidth(), mainStage.getHeight());
+        mainPane = new Pane();
+        mainScene = new Scene(mainPane, mainStage.getWidth(), mainStage.getHeight());
 
-        if (player == null) {
-            player = new Player();
-        }
-        player.setTranslateX((scene.getWidth() - player.getWidth())/2);
-        player.setTranslateY((scene.getHeight() - player.getHeight())/2);
-        pane.getChildren().add(player);
+        mainScene.setOnKeyPressed(e -> processKey(e.getCode(), true));
+        mainScene.setOnKeyReleased(e -> processKey(e.getCode(), false));
 
-        scene.setOnKeyPressed(e -> processKey(e.getCode(), true));
-        scene.setOnKeyReleased(e -> processKey(e.getCode(), false));
+        setBackground();
+        generateLevel();
+        createPlayer();
+        createExitToMainMenuButton();
+        setInventory();
+        playGameBackgroundMusic();
+        setChat();
+
+        addListeners();
 
         AnimationTimer timer = new AnimationTimer() {
             @Override
@@ -101,22 +102,27 @@ public class Game {
                 update();
             }
         };
-
-        mainScene = scene;
-
-        mainPane = pane;
-        setBackground();
-        generateLevel();
-        createExitToMainMenuButton();
-        setInventory();
         timer.start();
-        playGameBackgroundMusic();
-        setChat();
+    }
 
-        if (port != null) {
-            addChatMessage("Port: " + port);
-        }
+    protected void addListeners() {
+        addMainSceneClickListener();
+        addEscKeyListener();
+    }
 
+    protected void addEscKeyListener() {
+        mainScene.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode() == KeyCode.ESCAPE) {
+                    addChatMessage("YOU PRESSED ESCAPE");
+                }
+            }
+        });
+    }
+
+    protected void addMainSceneClickListener() {
         mainScene.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -132,7 +138,10 @@ public class Game {
                         }
                     }
                 }
-                setBlockFromInventory(event.getX(), event.getY());
+                if (Math.abs(player.getTranslateX() - event.getX()) <= 150 &&
+                        Math.abs(player.getTranslateY() - event.getY()) <= 150) {
+                    setBlockFromInventory(event.getX(), event.getY());
+                }
             }
         });
     }
@@ -159,6 +168,15 @@ public class Game {
 
     protected void update(String name) {
 
+    }
+
+    protected void createPlayer() {
+        if (player == null) {
+            player = new Player();
+        }
+        player.setTranslateX((mainScene.getWidth() - player.getWidth())/2);
+        player.setTranslateY((mainScene.getHeight() - player.getHeight())/2);
+        mainPane.getChildren().add(player);
     }
 
     protected void jumpPlayer(AbstractPlayer player) {
@@ -373,6 +391,10 @@ public class Game {
         chat.setTranslateY(mainScene.getHeight() - 200);
         chat.setFill(Color.WHITE);
         mainPane.getChildren().add(chat);
+
+        if (port != null) {
+            addChatMessage("Port: " + port);
+        }
     }
 
     public void addChatMessage(String message) {
