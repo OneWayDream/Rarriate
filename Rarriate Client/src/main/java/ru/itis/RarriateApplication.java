@@ -90,7 +90,7 @@ public class RarriateApplication {
 
     }
 
-    public void disconnect(){
+    public static void disconnect(){
         if (server!=null){
             server.stop();
         }
