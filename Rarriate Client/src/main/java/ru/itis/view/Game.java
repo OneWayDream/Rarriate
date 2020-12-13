@@ -25,6 +25,7 @@ import ru.itis.entities.items.implItems.GrassBlockItem;
 import ru.itis.entities.items.implItems.StoneBlockItem;
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.entities.player.implPlayers.Player;
+import ru.itis.exceptions.ClientException;
 import ru.itis.utils.FileLoader;
 import ru.itis.utils.MediaLoader;
 import ru.itis.utils.PropertiesLoader;
@@ -205,7 +206,7 @@ public class Game {
 
 
     //1 - addNewPlayer, 2 - movePlayer, ....
-    protected void updatePlayer(int type, String name, double x, double y) {
+    public void updatePlayer(int type, String name, double x, double y) {
         AbstractPlayer player = null;
         switch (type) {
             case 1:
@@ -227,7 +228,7 @@ public class Game {
     }
 
     //1 -add, 2-delete
-    protected void updateBlocks(int type, int id, double x, double y) {
+    public void updateBlocks(int type, int id, double x, double y) {
         switch (type) {
             case 1:
                 setBlock(id, x, y);
@@ -255,7 +256,6 @@ public class Game {
         mainPane.getChildren().add(player);
     }
 
-    //TODO mb string name?
     protected void createPlayer(AbstractPlayer player) {
         player.setTranslateX((mainScene.getWidth() - player.getWidth())/2);
         player.setTranslateY((mainScene.getHeight() - player.getHeight())/2);
@@ -300,6 +300,14 @@ public class Game {
                 }
             }
             player.moveX(movingRight ? 1 : -1);
+            try {
+                RarriateApplication.getClient().sendUDPFrame(
+                        RarriateApplication.getClient().getUdpFrameFactory().createUDPFrame(0,
+                                RarriateApplication.getClient().getClientUuid(), player.getTranslateX(), player.getTranslateY())
+                );
+            } catch (ClientException e) {
+                System.err.println(e.getMessage());
+            }
         }
     }
 
@@ -323,6 +331,14 @@ public class Game {
                 }
             }
             player.moveY(movingDown ? 1 : -1);
+            try {
+                RarriateApplication.getClient().sendUDPFrame(
+                        RarriateApplication.getClient().getUdpFrameFactory().createUDPFrame(0,
+                                RarriateApplication.getClient().getClientUuid(), player.getTranslateX(), player.getTranslateY())
+                );
+            } catch (ClientException e) {
+                System.err.println(e.getMessage());
+            }
         }
     }
 

@@ -1,6 +1,8 @@
 package ru.itis.network.utils;
 
+import ru.itis.RarriateApplication;
 import ru.itis.client.AbstractClient;
+import ru.itis.entities.blocks.Block;
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.exceptions.*;
 import ru.itis.network.client.RarriateClient;
@@ -25,13 +27,19 @@ public class RarriateClientKeyManager implements ClientKeyManager {
                 Object[] messageContent = tcpFrame.getContent();
                 switch (tcpFrame.getType()){
                     case 4:
-                        ((RarriateClient) client).getWorld().getPlayers().add(PlayerDto.to((PlayerDto) tcpFrame.getContent()[1]));
+                        PlayerDto playerDto = (PlayerDto) tcpFrame.getContent()[1];
+                        ((RarriateClient) client).getWorld().getPlayers().add(PlayerDto.to(playerDto));
+                        RarriateApplication.getGame().updatePlayer(1, playerDto.getName(), playerDto.getCoordX(), playerDto.getCoordY());
                         break;
                     case 6:
-                        ((RarriateClient) client).getWorld().getMap().getBlocks().remove(BlockDto.to((BlockDto) messageContent[1]));
+                        BlockDto blockDto = (BlockDto) messageContent[1];
+                        ((RarriateClient) client).getWorld().getMap().getBlocks().remove(BlockDto.to(blockDto));
+                        RarriateApplication.getGame().updateBlocks(2,blockDto.getType(), blockDto.getCoordX(), blockDto.getCoordY());
                         break;
                     case 8:
-                        ((RarriateClient) client).getWorld().getMap().getBlocks().add(BlockDto.to((BlockDto) messageContent[1]));
+                        BlockDto blockDto1 = (BlockDto) messageContent[1];
+                        ((RarriateClient) client).getWorld().getMap().getBlocks().add(BlockDto.to(blockDto1));
+                        RarriateApplication.getGame().updateBlocks(2,blockDto1.getType(), blockDto1.getCoordX(), blockDto1.getCoordY());
                         break;
                     case 10:
                         //TODO write message in the chat
@@ -58,6 +66,7 @@ public class RarriateClientKeyManager implements ClientKeyManager {
                                     if (abstractPlayer.getName().equals(playerName)){
                                         abstractPlayer.setTranslateX((int) messageContent[2]);
                                         abstractPlayer.setTranslateY((int) messageContent[3]);
+                                        RarriateApplication.getGame().updatePlayer(2, abstractPlayer.getName(), abstractPlayer.getTranslateX(), abstractPlayer.getTranslateY());
                                         break;
                                     }
                                 }
