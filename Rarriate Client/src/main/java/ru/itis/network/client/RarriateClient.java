@@ -19,6 +19,7 @@ import ru.itis.utils.ClientKeyManager;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.*;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
@@ -127,4 +128,5 @@ public class RarriateClient extends AbstractClient {
             System.out.println("Клиент успешно отключился");
         }
     }
+
 }

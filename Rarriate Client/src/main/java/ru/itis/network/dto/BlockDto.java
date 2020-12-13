@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import ru.itis.entities.blocks.Block;
 import ru.itis.entities.blocks.implBlocks.BedrockBlock;
 import ru.itis.entities.blocks.implBlocks.DirtBlock;
+import ru.itis.entities.blocks.implBlocks.GrassBlock;
 import ru.itis.entities.blocks.implBlocks.StoneBlock;
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.entities.player.implPlayers.Player;
@@ -29,12 +30,14 @@ public class BlockDto implements Serializable {
 
     public static BlockDto from(Block block){
         int blockType = - 1;
-        if (block instanceof DirtBlock){
-            blockType = 0;
-        } else if (block instanceof StoneBlock){
+        if (block instanceof StoneBlock){
             blockType = 1;
-        } else if (block instanceof BedrockBlock){
+        } else if (block instanceof DirtBlock){
             blockType = 2;
+        } else if (block instanceof GrassBlock){
+            blockType = 3;
+        } else if (block instanceof BedrockBlock){
+            blockType = 4;
         }
         return BlockDto.builder()
                 .coordX(block.getTranslateX())
@@ -52,19 +55,26 @@ public class BlockDto implements Serializable {
     public static Block to (BlockDto blockDto){
         Block result;
         switch (blockDto.getType()){
-            case 0:
-                result = new DirtBlock();
-                result.setTranslateX(blockDto.getCoordY());
-                result.setTranslateY(blockDto.getCoordX());
-                break;
             case 1:
                 result = new StoneBlock();
                 result.setTranslateX(blockDto.getCoordY());
                 result.setTranslateY(blockDto.getCoordX());
+                break;
             case 2:
+                result = new DirtBlock();
+                result.setTranslateX(blockDto.getCoordY());
+                result.setTranslateY(blockDto.getCoordX());
+                break;
+            case 3:
+                result = new GrassBlock();
+                result.setTranslateX(blockDto.getCoordY());
+                result.setTranslateY(blockDto.getCoordX());
+                break;
+            case 4:
                 result = new BedrockBlock();
                 result.setTranslateX(blockDto.getCoordY());
                 result.setTranslateY(blockDto.getCoordX());
+                break;
             default:
                 result = null;
                 break;
