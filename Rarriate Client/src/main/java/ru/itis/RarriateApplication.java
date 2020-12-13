@@ -86,6 +86,11 @@ public class RarriateApplication {
         Thread clientThread = new Thread(clientRun);
         clientThread.setDaemon(true);
         clientThread.start();
+        try{
+            Thread.sleep(3000); //Time to server settings
+        } catch (InterruptedException e) {
+            //ignore
+        }
         return serverTCPAddress.getPort();
     }
 
