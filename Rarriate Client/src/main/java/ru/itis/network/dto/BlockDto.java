@@ -57,23 +57,23 @@ public class BlockDto implements Serializable {
         switch (blockDto.getType()){
             case 1:
                 result = new StoneBlock();
-                result.setTranslateX(blockDto.getCoordY());
-                result.setTranslateY(blockDto.getCoordX());
+                result.setTranslateX(blockDto.getCoordX());
+                result.setTranslateY(blockDto.getCoordY());
                 break;
             case 2:
                 result = new DirtBlock();
-                result.setTranslateX(blockDto.getCoordY());
-                result.setTranslateY(blockDto.getCoordX());
+                result.setTranslateX(blockDto.getCoordX());
+                result.setTranslateY(blockDto.getCoordY());
                 break;
             case 3:
                 result = new GrassBlock();
-                result.setTranslateX(blockDto.getCoordY());
-                result.setTranslateY(blockDto.getCoordX());
+                result.setTranslateX(blockDto.getCoordX());
+                result.setTranslateY(blockDto.getCoordY());
                 break;
             case 4:
                 result = new BedrockBlock();
-                result.setTranslateX(blockDto.getCoordY());
-                result.setTranslateY(blockDto.getCoordX());
+                result.setTranslateX(blockDto.getCoordX());
+                result.setTranslateY(blockDto.getCoordY());
                 break;
             default:
                 result = null;

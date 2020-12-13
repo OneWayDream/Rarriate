@@ -1,6 +1,7 @@
 package ru.itis.view;
 
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
@@ -309,8 +310,8 @@ public class Game {
                 );
             } catch (ClientException e) {
                 System.err.println(e.getMessage());
+                }
             }
-        }
     }
 
     protected void movePlayerY(int value, AbstractPlayer player) {
@@ -380,7 +381,6 @@ public class Game {
             world = new World(new Map(mainScene.getHeight()), null);
         }
         blocks = world.getMap().getBlocks();
-
         for (Block block: blocks) {
             setBlock(block);
         }
