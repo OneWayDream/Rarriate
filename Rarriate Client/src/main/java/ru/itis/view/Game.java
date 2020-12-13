@@ -1,7 +1,6 @@
 package ru.itis.view;
 
 import javafx.animation.AnimationTimer;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
@@ -16,6 +15,7 @@ import ru.itis.RarriateApplication;
 import ru.itis.entities.Map;
 import ru.itis.entities.World;
 import ru.itis.entities.blocks.Block;
+import ru.itis.entities.blocks.implBlocks.BedrockBlock;
 import ru.itis.entities.blocks.implBlocks.DirtBlock;
 import ru.itis.entities.blocks.implBlocks.GrassBlock;
 import ru.itis.entities.blocks.implBlocks.StoneBlock;
@@ -48,6 +48,7 @@ public class Game {
     protected Pane inventoryPane;
 
     protected AbstractPlayer player;
+    protected List<AbstractPlayer> players;
     protected ImageView inventorySprite;
     protected List<Block> blocks;
 
@@ -90,7 +91,7 @@ public class Game {
         setBackground();
         generateLevel();
         createPlayer();
-        setInventory();
+        createInventory();
         playGameBackgroundMusic();
         setChat();
 
@@ -108,7 +109,34 @@ public class Game {
     protected void addListeners() {
         addMainSceneClickListener();
         addEscKeyListener();
+//        addMovingKeyListener();
     }
+
+//    protected void addMovingKeyListener() {
+//        mainScene.addEventHandler(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+//            @Override
+//            public void handle(KeyEvent event) {
+//                switch (event.getCode()) {
+//                    case A:
+//                        if (player.getTranslateX() > 0) {
+//                            player.moveX(-SPEED);
+//                        }
+//                        break;
+//                    case W:
+//                        if (player.getTranslateY() >= SPEED) {
+//                            jumpPlayer(player);
+//                        }
+//                        break;
+//                    case D:
+//                        if (player.getTranslateX() + player.getWidth() <= mainScene.getWidth()) {
+//                            player.moveX(SPEED);
+//                        }
+//                        break;
+//                }
+//
+//            }
+//        });
+//    }
 
     protected void addEscKeyListener() {
         Pane escapePane = new Pane();
@@ -160,7 +188,6 @@ public class Game {
         if (up && player.getTranslateY() >= SPEED) {
             jumpPlayer(player);
         }
-
         if (left && player.getTranslateX() > 0) {
             movePlayerX(-SPEED, player);
         }
@@ -176,8 +203,47 @@ public class Game {
         movePlayerY((int)player.getVelocity().getY(), player);
     }
 
-    protected void update(String name) {
 
+    //1 - addNewPlayer, 2 - movePlayer, ....
+    protected void updatePlayer(int type, String name, double x, double y) {
+        AbstractPlayer player = null;
+        switch (type) {
+            case 1:
+                addNewPlayer(name);
+                break;
+            case 2:
+                for (AbstractPlayer abstractPlayer : players) {
+                    if (abstractPlayer.getName().equals(name)) {
+                        player = abstractPlayer;
+                        break;
+                    }
+                }
+                player.setTranslateX(x);
+                player.setTranslateY(y);
+                break;
+            default:
+                break;
+        }
+    }
+
+    //1 -add, 2-delete
+    protected void updateBlocks(int type, int id, double x, double y) {
+        switch (type) {
+            case 1:
+                setBlock(id, x, y);
+                break;
+            case 2:
+                removeBlock(x,y);
+                break;
+            default:
+                break;
+        }
+    }
+
+    protected void addNewPlayer(String name) {
+        AbstractPlayer player = new Player(name);
+        players.add(player);
+        createPlayer(player);
     }
 
     protected void createPlayer() {
@@ -187,6 +253,25 @@ public class Game {
         player.setTranslateX((mainScene.getWidth() - player.getWidth())/2);
         player.setTranslateY((mainScene.getHeight() - player.getHeight())/2);
         mainPane.getChildren().add(player);
+    }
+
+    //TODO mb string name?
+    protected void createPlayer(AbstractPlayer player) {
+        player.setTranslateX((mainScene.getWidth() - player.getWidth())/2);
+        player.setTranslateY((mainScene.getHeight() - player.getHeight())/2);
+        mainPane.getChildren().add(player);
+        addChatMessage(player.getName() + " has been connected");
+    }
+
+    protected void deletePlayer(String name) {
+        for (AbstractPlayer player: players) {
+            if (player.getName().equals(name)) {
+                mainPane.getChildren().remove(player);
+                players.remove(player);
+                addChatMessage(player.getName() + " has been disconnected");
+                return;
+            }
+        }
     }
 
     protected void jumpPlayer(AbstractPlayer player) {
@@ -220,7 +305,6 @@ public class Game {
 
     protected void movePlayerY(int value, AbstractPlayer player) {
         boolean movingDown = value > 0;
-
         for (int i = 0; i < Math.abs(value); i++) {
             for (Block block : blocks) {
                 if (player.getBoundsInParent().intersects(block.getBoundsInParent())) {
@@ -252,20 +336,20 @@ public class Game {
                 }
                 break ;
             case D:
-                right = on ;
+                right = on;
                 player.setAnimation(AbstractPlayer.RUN_RIGHT);
                 if (!on) {
                     player.setAnimation(AbstractPlayer.IDLE);
                 }
-                break ;
+                break;
             case W:
-                up = on ;
-                break ;
+                up = on;
+                break;
             case S:
-                down = on ;
-                break ;
+                down = on;
+                break;
             default:
-                break ;
+                break;
         }
     }
 
@@ -281,6 +365,16 @@ public class Game {
 
         for (Block block: blocks) {
             setBlock(block);
+        }
+    }
+
+    protected void removeBlock(double x, double y) {
+        for (Block block: blocks) {
+            if (block.intersects(x,y,1,1)) {
+                blocks.remove(block);
+                mainPane.getChildren().remove(block);
+                return;
+            }
         }
     }
 
@@ -303,7 +397,7 @@ public class Game {
         }
     }
 
-    protected void setInventory() {
+    protected void createInventory() {
         inventorySprite = new ImageView(TextureLoader.getInventoryImage());
         inventorySprite.setFitHeight(100);
         inventorySprite.setFitWidth(800);
@@ -379,6 +473,31 @@ public class Game {
         mainPane.getChildren().add(block);
     }
 
+    protected void setBlock(int id, double x, double y) {
+        //TODO createBlockById
+        Block block = null;
+
+        switch (id) {
+            case 1:
+                block = new StoneBlock();
+                break;
+            case 2:
+                block = new DirtBlock();
+                break;
+            case 3:
+                block = new GrassBlock();
+                break;
+            case 4:
+                block = new BedrockBlock();
+                break;
+            default:
+                return;
+        }
+        block.setTranslateX(x);
+        block.setTranslateY(y);
+        mainPane.getChildren().add(block);
+    }
+
     protected void setBackground(){
         mainPane.setBackground(new Background(FileLoader.getGameBackground()));
     }
@@ -397,7 +516,6 @@ public class Game {
     protected void setChat() {
         messages = new String[MESSAGE_COUNT];
         chat = new ModernText();
-
         chat.setTranslateX(20);
         chat.setTranslateY(mainScene.getHeight() - 200);
         chat.setFill(Color.WHITE);

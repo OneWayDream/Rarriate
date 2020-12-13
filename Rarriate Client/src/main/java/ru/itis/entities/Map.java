@@ -32,7 +32,6 @@ public class Map implements Serializable {
         double y = height - (height % Block.HEIGHT);
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 40; j++) {
-                //TODO bedrock
                 BedrockBlock bb = new BedrockBlock();
                 bb.setTranslateX(Block.WIDTH * j);
                 bb.setTranslateY(y);

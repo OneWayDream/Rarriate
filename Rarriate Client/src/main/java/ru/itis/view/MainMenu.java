@@ -31,8 +31,6 @@ public class MainMenu {
 
     private int sceneWidth, sceneHeight;
 
-    //TODO создавать сцены и вызывать setScene();, а не удалять и создавать по новой
-
     private Stage mainStage;
     private VBox mainPane;
     private Scene mainScene;
@@ -100,24 +98,8 @@ public class MainMenu {
         mainPane.getChildren().clear();
 
         createLogo();
-
-        ModernButton hostButton = new ModernButton("Host");
-        hostButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                setMultiPlayerHostScene();
-            }
-        });
-
-        ModernButton connectButton = new ModernButton("Connect");
-        connectButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                setMultiPlayerConnectScene();
-            }
-        });
-
-        mainPane.getChildren().addAll(hostButton, connectButton);
+        createHostMultiPlayerButton();
+        createConnectMultiPlayerButton();
         createBackButton();
     }
 
@@ -240,6 +222,28 @@ public class MainMenu {
         mainPane.getChildren().add(enter);
     }
 
+    private void createConnectMultiPlayerButton() {
+        ModernButton connectButton = new ModernButton("Connect");
+        connectButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setMultiPlayerConnectScene();
+            }
+        });
+        mainPane.getChildren().add(connectButton);
+    }
+
+    private void createHostMultiPlayerButton() {
+        ModernButton hostButton = new ModernButton("Host");
+        hostButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setMultiPlayerHostScene();
+            }
+        });
+        mainPane.getChildren().add(hostButton);
+    }
+
     private void createStartMultiPlayerHostButton() {
         ModernButton startServer = new ModernButton("Run server");
         startServer.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -265,8 +269,6 @@ public class MainMenu {
         });
         mainPane.getChildren().add(back);
     }
-
-
 
     private void saveName() {
         propertiesLoader.setProperty("PLAYER_NAME", nameField.getText());

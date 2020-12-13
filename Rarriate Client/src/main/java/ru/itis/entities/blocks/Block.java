@@ -35,4 +35,12 @@ public abstract class Block extends Rectangle {
     protected void fillRectangle(Image image) {
         setFill(new ImagePattern(image));
     }
+
+    @Override
+    public String toString() {
+        return "Block{" +
+                "id=" + id +
+                ", breakable=" + breakable +
+                '}';
+    }
 }

@@ -80,4 +80,15 @@ public abstract class AbstractPlayer extends Rectangle implements Serializable {
     }
 
     protected abstract void startAnimation();
+
+    @Override
+    public String toString() {
+        return "AbstractPlayer{" +
+                "name='" + name + '\'' +
+                ", canJump=" + canJump +
+                ", velocity=" + velocity +
+                ", state=" + state +
+                ", inventory=" + inventory +
+                '}';
+    }
 }
