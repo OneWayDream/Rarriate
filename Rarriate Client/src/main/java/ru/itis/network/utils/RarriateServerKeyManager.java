@@ -152,6 +152,7 @@ public class RarriateServerKeyManager implements ServerKeyManager {
                                 server.sendBroadcastUDP(
                                         server.getUdpFrameFactory().createUDPFrame(
                                                 1,
+                                                server.getServerUuid(),
                                                 ((RarriateClientEntry) client).getPlayer().getName(),
                                                 moveX, moveY
                                         ),

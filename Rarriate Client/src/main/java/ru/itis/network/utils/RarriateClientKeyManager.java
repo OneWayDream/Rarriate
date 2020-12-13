@@ -64,8 +64,9 @@ public class RarriateClientKeyManager implements ClientKeyManager {
                                 String playerName = (String) messageContent[1];
                                 for (AbstractPlayer abstractPlayer: ((RarriateClient) client).getWorld().getPlayers()){
                                     if (abstractPlayer.getName().equals(playerName)){
-                                        abstractPlayer.setTranslateX((int) messageContent[2]);
-                                        abstractPlayer.setTranslateY((int) messageContent[3]);
+                                        abstractPlayer.setTranslateX((double) messageContent[2]);
+                                        abstractPlayer.setTranslateY((double) messageContent[3]);
+                                        System.out.println(RarriateApplication.getGame()==null);
                                         RarriateApplication.getGame().updatePlayer(2, abstractPlayer.getName(), abstractPlayer.getTranslateX(), abstractPlayer.getTranslateY());
                                         break;
                                     }

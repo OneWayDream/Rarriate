@@ -84,7 +84,7 @@ public class RarriateUDPFrameFactory implements UDPFrameFactory {
                             break;
                         case 1:
                             objects = new Object[4];
-                            objects[0] = in.readObject(); // Message id
+                            objects[0] = in.readObject(); // Server id
                             objects[1] = in.readObject(); // Player nickname
                             objects[2] = in.readObject(); // new X coordinates
                             objects[3] = in.readObject(); // new Y coordinates
