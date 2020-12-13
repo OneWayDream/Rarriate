@@ -92,7 +92,6 @@ public class RarriateUDPFrameFactory implements UDPFrameFactory {
                         default:
                             objects = new Object[0];
                             break;
-                        //TODO switch options for different types
                     }
                     in.close();
                     byteStream.close();

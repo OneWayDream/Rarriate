@@ -106,7 +106,8 @@ public class RarriateClient extends AbstractClient {
             }
         } catch (IOException ex) {
             throw new ClientException("Cannot connect client", ex);
-        } catch (KeyManagerException | TCPFrameFactoryException ex){
+        }
+        catch (KeyManagerException | TCPFrameFactoryException ex){
             throw new ClientException(ex.getMessage(), ex);
         } catch (IncorrectFCSException ex) {
             //TODO reaction

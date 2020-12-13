@@ -13,11 +13,10 @@ import ru.itis.network.server.RarriateServer;
 import ru.itis.network.utils.RarriateClientKeyManager;
 import ru.itis.network.utils.RarriateServerKeyManager;
 import ru.itis.start.RarriateStart;
+import ru.itis.view.Game;
 
 import java.io.IOException;
-import java.net.ConnectException;
-import java.net.InetSocketAddress;
-import java.nio.channels.SocketChannel;
+import java.net.*;
 
 public class RarriateApplication {
 
@@ -26,6 +25,7 @@ public class RarriateApplication {
 
     protected static RarriateClient client;
     protected static RarriateServer server;
+    protected static Game game;
 
     public static RarriateClient getClient() {
         return client;
@@ -35,7 +35,15 @@ public class RarriateApplication {
         return server;
     }
 
-    public static void main(String[] args) {
+    public static Game getGame(){
+        return game;
+    }
+
+    public static void setGame(Game gameG){
+        game = gameG;
+    }
+
+    public static void main(String[] args) throws SocketException {
         counter = minPortValue;
         RarriateStart.main(args);
     }
@@ -49,6 +57,8 @@ public class RarriateApplication {
 
         InetSocketAddress serverTCPAddress = getUniqueAddress();
         InetSocketAddress serverUDPAddress = getUniqueAddress();
+//        System.out.println(serverTCPAddress);
+//        System.out.println(serverUDPAddress);
 
         Runnable serverRun = () -> {
             try {
@@ -88,6 +98,7 @@ public class RarriateApplication {
         );
 
         InetSocketAddress clientUDPAddress = getUniqueAddress();
+        System.out.println(clientUDPAddress);
         Runnable clientRun = () -> {
             try {
                 client.connect(serverAddress, clientUDPAddress);
@@ -114,23 +125,34 @@ public class RarriateApplication {
         if (client!=null){
             client.disconnect();
         }
+        game = null;
     }
 
     protected static int counter;
 
     private static InetSocketAddress getUniqueAddress(){
         InetSocketAddress result = null;
+        ServerSocket ss = null;
+        DatagramSocket ds = null;
         while ((result==null)&&(counter<=maxPortValue)){
             try{
-                SocketChannel socketChannel = SocketChannel.open(new InetSocketAddress("localhost", counter));
-                socketChannel.close();
-            } catch (ConnectException ex){
-                result = new InetSocketAddress("localhost", counter);
-                break;
-            } catch (IOException ex){
-                //ignore
-            }
-            finally {
+                ss = new ServerSocket(counter);
+                ss.setReuseAddress(true);
+                ds = new DatagramSocket(counter);
+                ds.setReuseAddress(true);
+                return new InetSocketAddress("localhost", counter);
+            } catch (IOException e) {
+            } finally {
+                if (ds != null) {
+                    ds.close();
+                }
+                if (ss != null) {
+                    try {
+                        ss.close();
+                    } catch (IOException e) {
+                        //ignore
+                    }
+                }
                 counter++;
             }
         }

@@ -20,11 +20,29 @@
 ### 4 : server says that new player was connected
 ###### order - message id, player data
 
+### 5 : client break-block message
+###### order - message id, block data
+
+### 6 : server break-block message
+###### order - message id, block data
+
+### 7 : client block-place message
+###### order - message id, block data
+
+### 8 : server block-place message
+###### order - message id, block data
+
+### 9 : client chat-message
+###### order - message id, message text
+
+### 10 : server chat-message
+###### order - message id, sender-nickname and message text
+
 /*---------------------------------------------------------------------------*\
 
 # `INFORMATION ABOUT UDP TYPES`
 
-### 0 : client - player move frame
+### 0 : client - player move frame 
 
 ###### order - client id, newX, newY
 

@@ -4,6 +4,8 @@ import ru.itis.client.AbstractClient;
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.exceptions.*;
 import ru.itis.network.client.RarriateClient;
+import ru.itis.network.dto.BlockDto;
+import ru.itis.network.dto.PlayerDto;
 import ru.itis.protocol.TCPFrame;
 import ru.itis.protocol.UDPFrame;
 import ru.itis.utils.ClientKeyManager;
@@ -20,11 +22,20 @@ public class RarriateClientKeyManager implements ClientKeyManager {
         if (client.getClientSocketChannel().equals(key.channel())){
             try{
                 TCPFrame tcpFrame = client.getTcpFrameFactory().readTCPFrame(client.getClientSocketChannel());
-
-                System.out.println("Получил пакет, а вообще не должен -_-");
-
+                Object[] messageContent = tcpFrame.getContent();
                 switch (tcpFrame.getType()){
-                    //TODO обработка TCP - пакетов
+                    case 4:
+                        ((RarriateClient) client).getWorld().getPlayers().add(PlayerDto.to((PlayerDto) tcpFrame.getContent()[1]));
+                        break;
+                    case 6:
+                        ((RarriateClient) client).getWorld().getMap().getBlocks().remove(BlockDto.to((BlockDto) messageContent[1]));
+                        break;
+                    case 8:
+                        ((RarriateClient) client).getWorld().getMap().getBlocks().add(BlockDto.to((BlockDto) messageContent[1]));
+                        break;
+                    case 10:
+                        //TODO write message in the chat
+                        break;
                 }
             } catch (TCPFrameFactoryException ex) {
                 throw new KeyManagerException(ex.getMessage(), ex);

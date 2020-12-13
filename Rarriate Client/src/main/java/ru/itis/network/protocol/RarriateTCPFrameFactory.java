@@ -38,19 +38,20 @@ public class RarriateTCPFrameFactory implements TCPFrameFactory {
     }
 
     @Override
-    public TCPFrame readTCPFrame(SocketChannel serverTCPSocket) throws TCPFrameFactoryException, IncorrectFCSException {
+    public TCPFrame readTCPFrame(SocketChannel channel) throws TCPFrameFactoryException, IncorrectFCSException {
+        TCPFrame result = null;
         try{
-            TCPFrame result = null;
-            InputStream in = serverTCPSocket.socket().getInputStream();
-            byte framePr = (byte) in.read();
-            byte frameSdf = (byte) in.read();
+            ByteBuffer serviceBytesBuffer = ByteBuffer.allocate(5);
+            channel.read(serviceBytesBuffer);
+            serviceBytesBuffer.flip();
+            byte framePr = serviceBytesBuffer.get();
+            byte frameSdf = serviceBytesBuffer.get();
             if ((framePr == pr)&&(frameSdf == sdf)){
-                byte type = (byte) in.read();
-                int dataLength = ByteBuffer.wrap(new byte[]{(byte) in.read(), (byte) in.read()}).getShort();
-                byte[] recvData = new byte[dataLength + 1];
-                for (int i = 0; i < dataLength + 1; i++){
-                    recvData[i] = (byte) in.read();
-                }
+                byte type = serviceBytesBuffer.get();
+                int dataLength = serviceBytesBuffer.getShort();
+                ByteBuffer recvDataBuffer = ByteBuffer.allocate(dataLength + 1);
+                channel.read(recvDataBuffer);
+                byte[] recvData = recvDataBuffer.array();
                 int currentSum = pr + sdf + type + dataLength;
                 for (int i = 0; i < dataLength; i++){
                     currentSum+=recvData[i];
@@ -60,11 +61,8 @@ public class RarriateTCPFrameFactory implements TCPFrameFactory {
                 ObjectInputStream inObject = new ObjectInputStream(new BufferedInputStream(byteStream));
                 Object[] objects;
 
-                //System.out.println(Arrays.toString(recvData));
-
                 if (recvData[recvData.length-1] == fcs){
                     switch (type){
-                        //TODO switch options for different types
                         case 1:
                             objects = new Object[3];
                             objects[0] = inObject.readObject(); //Message id
@@ -79,6 +77,33 @@ public class RarriateTCPFrameFactory implements TCPFrameFactory {
                             objects[3] = inObject.readObject(); //Server id
                             objects[4] = inObject.readObject(); //World
                             break;
+                        case 3:
+                            objects = new Object[0]; //Info-frame
+                            break;
+                        case 4:
+                            objects = new Object[2];
+                            objects[0] = inObject.readObject(); //Message id
+                            objects[1] = inObject.readObject(); //Player data
+                            break;
+                        case 5:
+                        case 6:
+                        case 7:
+                        case 8:
+                            objects = new Object[2];
+                            objects[0] = inObject.readObject(); //Message id
+                            objects[1] = inObject.readObject(); //Block data (5-6 - break block, 7-8 - place block)
+                            break;
+                        case 9:
+                            objects = new Object[2];
+                            objects[0] = inObject.readObject(); //Message id
+                            objects[1] = inObject.readObject(); //Message-text
+                            break;
+                        case 10:
+                            objects = new Object[3];
+                            objects[0] = inObject.readObject(); //Message id
+                            objects[1] = inObject.readObject(); //Sender-nickname
+                            objects[2] = inObject.readObject(); //Message-text
+                            break;
                         default:
                             objects = new Object[0];
                             break;
@@ -90,7 +115,6 @@ public class RarriateTCPFrameFactory implements TCPFrameFactory {
                 byteStream.close();
                 result = new TCPFrame(this, type, objects);
             }
-            //in.close(); - Not close!!!!!!!
             return result;
         } catch (IOException ex) {
             throw new TCPFrameFactoryException("Cannot read TCP frame.", ex);
@@ -100,7 +124,7 @@ public class RarriateTCPFrameFactory implements TCPFrameFactory {
     }
 
     @Override
-    public void writeTCPFrame(SocketChannel serverTCPSocket, TCPFrame tcpFrame) throws TCPFrameFactoryException {
+    public void writeTCPFrame(SocketChannel channel, TCPFrame tcpFrame) throws TCPFrameFactoryException {
         try{
             ByteArrayOutputStream byteStream = new ByteArrayOutputStream(maxLength);
             ObjectOutputStream outObject = new ObjectOutputStream(new BufferedOutputStream(byteStream));
@@ -115,22 +139,17 @@ public class RarriateTCPFrameFactory implements TCPFrameFactory {
                 currentSum+=sendBuf[i];
             }
             byte fcs = (byte) (currentSum%3 << 6 | currentSum%5 << 3 | currentSum%7);
-            OutputStream out = serverTCPSocket.socket().getOutputStream();
-            out.write(pr);
-            out.write(sdf);
 
-            System.out.println(tcpFrame.getType());
+            ByteBuffer sendData = ByteBuffer.allocate(5 + sendBuf.length + 1);
+            sendData.put(pr);
+            sendData.put(sdf);
+            sendData.put((byte) tcpFrame.getType());
+            sendData.putShort((short) sendBuf.length);
+            sendData.put(sendBuf);
+            sendData.put(fcs);
+            sendData.flip();
+            channel.write(sendData);
 
-            out.write(tcpFrame.getType());
-
-            ByteBuffer byteBuffer = ByteBuffer.allocate(2);
-            byteBuffer.putShort((short) sendBuf.length);
-            out.write(byteBuffer.array());
-
-            out.write(sendBuf);
-            out.write(fcs);
-            out.flush();
-            //out.close(); - Not close!!!!!!!!!!
         }catch (IOException ex) {
             throw new TCPFrameFactoryException("Cannot send TCP message", ex);
         }

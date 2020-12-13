@@ -2,6 +2,7 @@ package ru.itis.network.utils;
 
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.exceptions.*;
+import ru.itis.network.dto.BlockDto;
 import ru.itis.network.dto.PlayerDto;
 import ru.itis.network.dto.WorldDto;
 import ru.itis.network.server.RarriateServer;
@@ -103,6 +104,8 @@ public class RarriateServerKeyManager implements ServerKeyManager {
                 } else {
                     closeConnection(client);
                 }
+            } else {
+                closeConnection(client);
             }
         } catch (IOException|TCPFrameFactoryException ex) {
             closeConnection(client);
@@ -143,6 +146,9 @@ public class RarriateServerKeyManager implements ServerKeyManager {
                             case 0:
                                 int moveX = (int) messageContent[1];
                                 int moveY = (int) messageContent[2];
+                                AbstractPlayer clientPlayer = ((RarriateClientEntry) client).getPlayer();
+                                clientPlayer.setTranslateX(moveX);
+                                clientPlayer.setTranslateY(moveY);
                                 server.sendBroadcastUDP(
                                         server.getUdpFrameFactory().createUDPFrame(
                                                 1,
@@ -166,8 +172,40 @@ public class RarriateServerKeyManager implements ServerKeyManager {
             try{
                 SocketChannel client = (SocketChannel) key.channel();
                 TCPFrame tcpFrame = server.getTcpFrameFactory().readTCPFrame(client);
-                switch (tcpFrame.getType()){
-                    //TODO обработка TCP - пакетов
+                UUID messageUuid = UUID.randomUUID();
+                if (tcpFrame!=null){
+                    Object[] messageContent = tcpFrame.getContent();
+                    switch (tcpFrame.getType()){
+                        case 5:
+                            ((RarriateServer) server).getWorld().getMap().getBlocks()
+                                    .remove(BlockDto.to((BlockDto) messageContent[1]));
+                            server.sendBroadcastTCP(
+                                    server.getTcpFrameFactory().createTCPFrame(6, messageUuid, messageContent[1]),
+                                    client
+                            );
+                            break;
+                        case 7:
+                            ((RarriateServer) server).getWorld().getMap().getBlocks()
+                                    .add(BlockDto.to((BlockDto) messageContent[1]));
+                            server.sendBroadcastTCP(
+                                    server.getTcpFrameFactory().createTCPFrame(8, messageUuid, messageContent[1]),
+                                    client
+                            );
+                            break;
+                        case 9:
+                            for (ClientEntry clientEntry : server.getClientSet()){
+                                if ( clientEntry.getSocketChannel().equals(client)){
+                                    server.sendBroadcastTCP(
+                                            server.getTcpFrameFactory().createTCPFrame
+                                                    (10, messageUuid,
+                                                            ((RarriateClientEntry) clientEntry).getPlayer().getName(),
+                                                            messageContent[1])
+                                    );
+                                    break;
+                                }
+                            }
+                            break;
+                    }
                 }
             } catch (TCPFrameFactoryException ex) {
                 throw new KeyManagerException(ex.getMessage(), ex);
@@ -175,6 +213,8 @@ public class RarriateServerKeyManager implements ServerKeyManager {
                 //TODO reaction on incorrect frame
             } catch (IllegalBlockingModeException ex){
                 throw new ClientDisconnectException(key);
+            } catch (ServerException ex){
+                throw new KeyManagerException("Cannot send broadcast to other users", ex);
             }
         }
     }
