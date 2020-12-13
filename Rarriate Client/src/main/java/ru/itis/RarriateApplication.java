@@ -118,7 +118,11 @@ public class RarriateApplication {
         } catch (ClientWorkException ex){
             RarriateStart.main(null);
         }
-
+        try{
+            Thread.sleep(3000); //Time to server settings
+        } catch (InterruptedException e) {
+            //ignore
+        }
         return client.getWorld();
 
     }

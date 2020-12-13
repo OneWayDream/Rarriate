@@ -144,8 +144,8 @@ public class RarriateServerKeyManager implements ServerKeyManager {
                     if (client!=null){
                         switch (receivedUDPFrame.getType()){
                             case 0:
-                                int moveX = (int) messageContent[1];
-                                int moveY = (int) messageContent[2];
+                                double moveX = (double) messageContent[1];
+                                double moveY = (double) messageContent[2];
                                 AbstractPlayer clientPlayer = ((RarriateClientEntry) client).getPlayer();
                                 clientPlayer.setTranslateX(moveX);
                                 clientPlayer.setTranslateY(moveY);

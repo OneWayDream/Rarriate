@@ -33,6 +33,7 @@ import ru.itis.utils.TextureLoader;
 import ru.itis.view.components.ModernButton;
 import ru.itis.view.components.ModernText;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -81,6 +82,7 @@ public class Game {
     }
 
     protected void createGUI(Stage stage, ViewManager viewManager) {
+        players = new ArrayList<>();
         mainStage = stage;
         this.viewManager = viewManager;
         mainPane = new Pane();
