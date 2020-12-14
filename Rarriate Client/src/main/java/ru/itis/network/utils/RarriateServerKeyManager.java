@@ -1,5 +1,6 @@
 package ru.itis.network.utils;
 
+import ru.itis.entities.blocks.Block;
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.exceptions.*;
 import ru.itis.network.dto.BlockDto;
@@ -82,7 +83,7 @@ public class RarriateServerKeyManager implements ServerKeyManager {
                         server.getClientSet().add(clientEntry);
 
                         UUID clientNotification = UUID.randomUUID();
-                        ((RarriateServer) server).getWorld().getPlayers().add(player);
+//                        ((RarriateServer) server).getWorld().getPlayers().add(player);
 
                         server.sendBroadcastTCP(
                                 server.getTcpFrameFactory().createTCPFrame(4,
@@ -178,16 +179,16 @@ public class RarriateServerKeyManager implements ServerKeyManager {
                     Object[] messageContent = tcpFrame.getContent();
                     switch (tcpFrame.getType()){
                         case 5:
-                            ((RarriateServer) server).getWorld().getMap().getBlocks()
-                                    .remove(BlockDto.to((BlockDto) messageContent[1]));
+//                            ((RarriateServer) server).getWorld().getMap().getBlocks()
+//                                    .remove(BlockDto.to((BlockDto) messageContent[1]));
                             server.sendBroadcastTCP(
                                     server.getTcpFrameFactory().createTCPFrame(6, messageUuid, messageContent[1]),
                                     client
                             );
                             break;
                         case 7:
-                            ((RarriateServer) server).getWorld().getMap().getBlocks()
-                                    .add(BlockDto.to((BlockDto) messageContent[1]));
+//                            ((RarriateServer) server).getWorld().getMap().getBlocks()
+//                                    .add(BlockDto.to((BlockDto) messageContent[1]));
                             server.sendBroadcastTCP(
                                     server.getTcpFrameFactory().createTCPFrame(8, messageUuid, messageContent[1]),
                                     client

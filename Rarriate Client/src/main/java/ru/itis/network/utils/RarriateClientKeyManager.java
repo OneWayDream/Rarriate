@@ -47,7 +47,7 @@ public class RarriateClientKeyManager implements ClientKeyManager {
                         BlockDto blockDto1 = (BlockDto) messageContent[1];
                         ((RarriateClient) client).getWorld().getMap().getBlocks().add(BlockDto.to(blockDto1));
                         Platform.runLater(()->
-                                        RarriateApplication.getGame().updateBlocks(2,blockDto1.getType(), blockDto1.getCoordX(), blockDto1.getCoordY())
+                                        RarriateApplication.getGame().updateBlocks(1,blockDto1.getType(), blockDto1.getCoordX(), blockDto1.getCoordY())
                                 );
                         //RarriateApplication.getGame().updateBlocks(2,blockDto1.getType(), blockDto1.getCoordX(), blockDto1.getCoordY());
                         break;

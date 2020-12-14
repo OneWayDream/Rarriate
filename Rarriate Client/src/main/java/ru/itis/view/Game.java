@@ -27,6 +27,8 @@ import ru.itis.entities.items.implItems.StoneBlockItem;
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.entities.player.implPlayers.Player;
 import ru.itis.exceptions.ClientException;
+import ru.itis.network.dto.BlockDto;
+import ru.itis.protocol.TCPFrame;
 import ru.itis.utils.FileLoader;
 import ru.itis.utils.MediaLoader;
 import ru.itis.utils.PropertiesLoader;
@@ -37,6 +39,7 @@ import ru.itis.view.components.ModernText;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class Game {
 
@@ -65,6 +68,8 @@ public class Game {
     protected int fillMessages;
 
     protected Integer port;
+
+    protected AnimationTimer timer;
 
     protected boolean up;
     protected boolean down;
@@ -107,7 +112,7 @@ public class Game {
         addListeners();
 
         addPlayers(players);
-        AnimationTimer timer = new AnimationTimer() {
+        timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 update();
@@ -219,6 +224,8 @@ public class Game {
         }
 
         movePlayerY((int)player.getVelocity().getY(), player);
+//        System.out.println("Client " + player.getTranslateX() + " " + player.getTranslateY());
+
     }
 
 
@@ -231,10 +238,10 @@ public class Game {
                 break;
             case 2:
                 for (AbstractPlayer abstractPlayer : players) {
-                    if (abstractPlayer.getName().equals(name)) {
+                    if (abstractPlayer.getName().equals(name) && !abstractPlayer.getName().equals(this.player.getName())) {
                         abstractPlayer.setTranslateX(x);
                         abstractPlayer.setTranslateY(y);
-                        break;
+//                        System.out.println("Client видит сервера как: " + abstractPlayer.getTranslateX() + " " + abstractPlayer.getTranslateY());
                     }
                 }
                 break;
@@ -258,14 +265,17 @@ public class Game {
     }
 
     protected void addNewPlayer(String name) {
-        AbstractPlayer player = new Player(name);
-        players.add(player);
-        createPlayer(player);
+        AbstractPlayer newPlayer = new Player(name);
+        players.add(newPlayer);
+        createPlayer(newPlayer);
     }
 
     protected void createPlayer() {
         if (player == null) {
             player = new Player();
+        }
+        if ((world.getPlayers() != null) && (!world.getPlayers().contains(player))) {
+            world.getPlayers().add(player);
         }
         player.setTranslateX((mainScene.getWidth() - player.getWidth())/2);
         player.setTranslateY((mainScene.getHeight() - player.getHeight())/2);
@@ -316,15 +326,18 @@ public class Game {
                 }
             }
             player.moveX(movingRight ? 1 : -1);
-            try {
-                RarriateApplication.getClient().sendUDPFrame(
-                        RarriateApplication.getClient().getUdpFrameFactory().createUDPFrame(0,
-                                RarriateApplication.getClient().getClientUuid(), player.getTranslateX(), player.getTranslateY())
-                );
-            } catch (ClientException e) {
-                System.err.println(e.getMessage());
+            if (port != null) {
+                try {
+                    RarriateApplication.getClient().sendUDPFrame(
+                            RarriateApplication.getClient().getUdpFrameFactory().createUDPFrame(0,
+                                    RarriateApplication.getClient().getClientUuid(), player.getTranslateX(), player.getTranslateY())
+                    );
+                } catch (ClientException e) {
+                    System.err.println(e.getMessage());
                 }
             }
+            }
+
     }
 
     protected void movePlayerY(int value, AbstractPlayer player) {
@@ -347,13 +360,15 @@ public class Game {
                 }
             }
             player.moveY(movingDown ? 1 : -1);
-            try {
-                RarriateApplication.getClient().sendUDPFrame(
-                        RarriateApplication.getClient().getUdpFrameFactory().createUDPFrame(0,
-                                RarriateApplication.getClient().getClientUuid(), player.getTranslateX(), player.getTranslateY())
-                );
-            } catch (ClientException e) {
-                System.err.println(e.getMessage());
+            if (port != null) {
+                try {
+                    RarriateApplication.getClient().sendUDPFrame(
+                            RarriateApplication.getClient().getUdpFrameFactory().createUDPFrame(0,
+                                    RarriateApplication.getClient().getClientUuid(), player.getTranslateX(), player.getTranslateY())
+                    );
+                } catch (ClientException e) {
+                    System.err.println(e.getMessage());
+                }
             }
         }
     }
@@ -380,8 +395,6 @@ public class Game {
             case S:
                 down = on;
                 break;
-            default:
-                break;
         }
     }
 
@@ -400,12 +413,21 @@ public class Game {
     }
 
     protected void removeBlock(double x, double y) {
+        for (Block block1 : blocks) {
+            System.out.println(block1.getTranslateX() + " " + block1.getTranslateY());
+        }
         for (Block block: blocks) {
-            if (block.intersects(x,y,1,1)) {
+            if (block.getBoundsInParent().intersects(x+1,y,1,1)) {
+//                System.out.println("Remove: " + block.getTranslateX() + " " + block.getTranslateY());
                 blocks.remove(block);
+
                 mainPane.getChildren().remove(block);
-                return;
+                break;
             }
+        }
+        System.out.println("----------------------------------");
+        for (Block block1 : blocks) {
+            System.out.println(block1.getTranslateX() + " " + block1.getTranslateY());
         }
     }
 
@@ -414,6 +436,16 @@ public class Game {
         mainPane.getChildren().remove(block);
         blocks.remove(block);
         updateInventory();
+        if (RarriateApplication.getClient() != null) {
+            try {
+                RarriateApplication.getClient().sendTCPFrame(
+                        RarriateApplication.getClient().getTcpFrameFactory().createTCPFrame(5,
+                                UUID.randomUUID(), BlockDto.from(block))
+                );
+            } catch (ClientException e) {
+                System.err.println(e.getMessage());
+            }
+        }
     }
 
     protected void setBlockFromInventory(double x, double y) {
@@ -425,6 +457,16 @@ public class Game {
             blocks.add(block);
             setBlock(block);
             updateInventory();
+            if (RarriateApplication.getClient() != null) {
+                try {
+                    RarriateApplication.getClient().sendTCPFrame(
+                            RarriateApplication.getClient().getTcpFrameFactory().createTCPFrame(7,
+                                    UUID.randomUUID(), BlockDto.from(block))
+                    );
+                } catch (ClientException e) {
+                    System.err.println(e.getMessage());
+                }
+            }
         }
     }
 
@@ -491,9 +533,8 @@ public class Game {
         exit.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if (port != null) {
-                    RarriateApplication.disconnect();
-                }
+                timer.stop();
+                RarriateApplication.disconnect();
                 exitToMainMenu();
             }
         });
@@ -505,7 +546,6 @@ public class Game {
     }
 
     protected void setBlock(int id, double x, double y) {
-        //TODO createBlockById
         Block block = null;
 
         switch (id) {
@@ -526,7 +566,9 @@ public class Game {
         }
         block.setTranslateX(x);
         block.setTranslateY(y);
+        blocks.add(block);
         mainPane.getChildren().add(block);
+
     }
 
     protected void setBackground(){
