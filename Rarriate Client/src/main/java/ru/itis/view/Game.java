@@ -80,11 +80,11 @@ public class Game {
         this.world = world;
         this.players = world.getPlayers();
         this.port = port;
-        addPlayers(players);
         createGUI(stage, viewManager);
     }
 
     protected void createGUI(Stage stage, ViewManager viewManager) {
+        players = new ArrayList<>();
         mainStage = stage;
         this.viewManager = viewManager;
         mainPane = new Pane();
@@ -102,6 +102,7 @@ public class Game {
 
         addListeners();
 
+        addPlayers(players);
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -225,13 +226,13 @@ public class Game {
                 break;
             case 2:
                 for (AbstractPlayer abstractPlayer : players) {
+                    System.out.println(abstractPlayer.toString());
                     if (abstractPlayer.getName().equals(name)) {
-                        player = abstractPlayer;
+                        abstractPlayer.setTranslateX(x);
+                        abstractPlayer.setTranslateY(y);
                         break;
                     }
                 }
-                player.setTranslateX(x);
-                player.setTranslateY(y);
                 break;
             default:
                 break;
