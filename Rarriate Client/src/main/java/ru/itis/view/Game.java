@@ -78,7 +78,9 @@ public class Game {
     public Game(Stage stage, ViewManager viewManager, World world, AbstractPlayer player, int port) {
         this.player = player;
         this.world = world;
+        this.players = world.getPlayers();
         this.port = port;
+        addPlayers(players);
         createGUI(stage, viewManager);
     }
 
@@ -162,6 +164,12 @@ public class Game {
                 }
             }
         });
+    }
+
+    protected void addPlayers(List<AbstractPlayer> players) {
+        for (AbstractPlayer player: players) {
+            mainPane.getChildren().add(player);
+        }
     }
 
     protected void addMainSceneClickListener() {
