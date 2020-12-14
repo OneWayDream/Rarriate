@@ -71,10 +71,12 @@ public class Game {
     protected boolean left;
     protected boolean right;
 
+    //SinglePlayer game
     public Game(Stage stage, ViewManager viewManager){
         createGUI(stage, viewManager);
     }
 
+    //MultiPlayer game
     public Game(Stage stage, ViewManager viewManager, World world, AbstractPlayer player, int port) {
         this.player = player;
         this.world = world;
@@ -84,7 +86,9 @@ public class Game {
     }
 
     protected void createGUI(Stage stage, ViewManager viewManager) {
-        players = new ArrayList<>();
+        if (players == null) {
+            players = new ArrayList<>();
+        }
         mainStage = stage;
         this.viewManager = viewManager;
         mainPane = new Pane();
@@ -167,9 +171,10 @@ public class Game {
     }
 
     protected void addPlayers(List<AbstractPlayer> players) {
-        this.players = players;
         for (AbstractPlayer player: players) {
-            mainPane.getChildren().add(player);
+            if (!player.getName().equals(this.player.getName())) {
+                mainPane.getChildren().add(player);
+            }
         }
     }
 
@@ -226,7 +231,6 @@ public class Game {
                 break;
             case 2:
                 for (AbstractPlayer abstractPlayer : players) {
-                    System.out.println(abstractPlayer.toString());
                     if (abstractPlayer.getName().equals(name)) {
                         abstractPlayer.setTranslateX(x);
                         abstractPlayer.setTranslateY(y);
