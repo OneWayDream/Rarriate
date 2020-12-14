@@ -87,7 +87,7 @@ public class RarriateApplication {
         clientThread.setDaemon(true);
         clientThread.start();
         try{
-            Thread.sleep(3000); //Time to server settings
+            Thread.sleep(5000); //Time to server settings
         } catch (InterruptedException e) {
             //ignore
         }
@@ -119,7 +119,7 @@ public class RarriateApplication {
             RarriateStart.main(null);
         }
         try{
-            Thread.sleep(3000); //Time to server settings
+            Thread.sleep(5000); //Time to server settings
         } catch (InterruptedException e) {
             //ignore
         }

@@ -10,8 +10,6 @@ import ru.itis.entities.blocks.implBlocks.BedrockBlock;
 import ru.itis.entities.blocks.implBlocks.DirtBlock;
 import ru.itis.entities.blocks.implBlocks.GrassBlock;
 import ru.itis.entities.blocks.implBlocks.StoneBlock;
-import ru.itis.entities.player.AbstractPlayer;
-import ru.itis.entities.player.implPlayers.Player;
 
 import java.io.Serializable;
 import java.util.List;
