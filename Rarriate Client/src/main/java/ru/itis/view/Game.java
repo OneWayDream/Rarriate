@@ -85,7 +85,6 @@ public class Game {
     }
 
     protected void createGUI(Stage stage, ViewManager viewManager) {
-        players = new ArrayList<>();
         mainStage = stage;
         this.viewManager = viewManager;
         mainPane = new Pane();
@@ -167,6 +166,7 @@ public class Game {
     }
 
     protected void addPlayers(List<AbstractPlayer> players) {
+        this.players = players;
         for (AbstractPlayer player: players) {
             mainPane.getChildren().add(player);
         }
