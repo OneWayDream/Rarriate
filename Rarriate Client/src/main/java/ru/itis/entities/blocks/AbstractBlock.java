@@ -1,16 +1,11 @@
 package ru.itis.entities.blocks;
 
-import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
-import java.io.InputStream;
 
-public abstract class Block extends Rectangle {
+public abstract class AbstractBlock extends Rectangle {
 
     public static final double HEIGHT = 50;
     public static final double WIDTH = 50;
@@ -18,7 +13,7 @@ public abstract class Block extends Rectangle {
     protected int id;
     protected boolean breakable;
 
-    public Block(){
+    public AbstractBlock(){
         super(WIDTH, HEIGHT);
         breakable = true;
         id = -1;
@@ -38,7 +33,7 @@ public abstract class Block extends Rectangle {
 
     @Override
     public String toString() {
-        return "Block{" +
+        return "AbstractBlock{" +
                 "id=" + id +
                 ", breakable=" + breakable +
                 '}';

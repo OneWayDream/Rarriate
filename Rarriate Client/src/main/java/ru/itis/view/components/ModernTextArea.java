@@ -1,7 +1,6 @@
 package ru.itis.view.components;
 
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.Background;
 import ru.itis.utils.FontLoader;
 
 public class ModernTextArea extends TextArea {

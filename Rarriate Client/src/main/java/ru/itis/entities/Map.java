@@ -1,9 +1,8 @@
 package ru.itis.entities;
 
-import ru.itis.entities.blocks.Block;
-import ru.itis.entities.blocks.implBlocks.BedrockBlock;
+import ru.itis.entities.blocks.AbstractBlock;
+import ru.itis.entities.blocks.implBlocks.*;
 import ru.itis.entities.blocks.implBlocks.DirtBlock;
-import ru.itis.entities.blocks.implBlocks.GrassBlock;
 import ru.itis.entities.blocks.implBlocks.StoneBlock;
 
 import java.io.Serializable;
@@ -11,61 +10,61 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Map implements Serializable {
-    private List<Block> blocks;
+    private List<AbstractBlock> abstractBlocks;
 
     public Map(double height) {
-        blocks = new ArrayList<>();
+        abstractBlocks = new ArrayList<>();
         generateBlocks(height);
     }
 
-    public Map(List<Block> blocks) {
-        this.blocks = blocks;
+    public Map(List<AbstractBlock> abstractBlocks) {
+        this.abstractBlocks = abstractBlocks;
     }
 
-    public List<Block> getBlocks () {
-        return blocks;
+    public List<AbstractBlock> getAbstractBlocks() {
+        return abstractBlocks;
     }
 
 
     //1 - bedrock, 2 - bedrock, 3 - stone, 4 - stone, 5 - dirt, 6 - dirt, 7 - grass
     private void generateBlocks(double height) {
-        double y = height - (height % Block.HEIGHT);
+        double y = height - (height % AbstractBlock.HEIGHT);
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 40; j++) {
                 BedrockBlock bb = new BedrockBlock();
-                bb.setTranslateX(Block.WIDTH * j);
+                bb.setTranslateX(AbstractBlock.WIDTH * j);
                 bb.setTranslateY(y);
-                blocks.add(bb);
+                abstractBlocks.add(bb);
             }
-            y -= Block.HEIGHT;
+            y -= AbstractBlock.HEIGHT;
         }
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 40; j++) {
                 StoneBlock sb = new StoneBlock();
-                sb.setTranslateX(Block.WIDTH * j);
+                sb.setTranslateX(AbstractBlock.WIDTH * j);
                 sb.setTranslateY(y);
-                blocks.add(sb);
+                abstractBlocks.add(sb);
             }
-            y -= Block.HEIGHT;
+            y -= AbstractBlock.HEIGHT;
         }
 
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 40; j++) {
                 DirtBlock db = new DirtBlock();
-                db.setTranslateX(Block.WIDTH * j);
+                db.setTranslateX(AbstractBlock.WIDTH * j);
                 db.setTranslateY(y);
-                blocks.add(db);
+                abstractBlocks.add(db);
             }
-            y -= Block.HEIGHT;
+            y -= AbstractBlock.HEIGHT;
         }
 
         for (int j = 0; j < 40; j++) {
             GrassBlock gb = new GrassBlock();
-            gb.setTranslateX(Block.WIDTH * j);
+            gb.setTranslateX(AbstractBlock.WIDTH * j);
             gb.setTranslateY(y);
-            blocks.add(gb);
+            abstractBlocks.add(gb);
         }
-        y -= Block.HEIGHT;
+        y -= AbstractBlock.HEIGHT;
     }
 }

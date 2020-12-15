@@ -1,7 +1,6 @@
 package ru.itis.entities;
 
 import ru.itis.entities.player.AbstractPlayer;
-import ru.itis.entities.player.implPlayers.Player;
 
 import java.io.Serializable;
 import java.util.List;

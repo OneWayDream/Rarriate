@@ -20,17 +20,17 @@
 ### 4 : server says that new player was connected
 ###### order - message id, player data
 
-### 5 : client break-block message
-###### order - message id, block data
+### 5 : client break-abstractBlock message
+###### order - message id, abstractBlock data
 
-### 6 : server break-block message
-###### order - message id, block data
+### 6 : server break-abstractBlock message
+###### order - message id, abstractBlock data
 
-### 7 : client block-place message
-###### order - message id, block data
+### 7 : client abstractBlock-place message
+###### order - message id, abstractBlock data
 
-### 8 : server block-place message
-###### order - message id, block data
+### 8 : server abstractBlock-place message
+###### order - message id, abstractBlock data
 
 ### 9 : client chat-message
 ###### order - message id, message text

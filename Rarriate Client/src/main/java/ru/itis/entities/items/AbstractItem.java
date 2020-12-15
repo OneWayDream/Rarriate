@@ -2,7 +2,6 @@ package ru.itis.entities.items;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import ru.itis.utils.FileLoader;
 
 import java.io.Serializable;
 

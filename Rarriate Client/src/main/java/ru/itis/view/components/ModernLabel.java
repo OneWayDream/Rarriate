@@ -1,7 +1,6 @@
 package ru.itis.view.components;
 
 import javafx.scene.control.Label;
-import javafx.scene.text.Font;
 import ru.itis.utils.FontLoader;
 
 import java.io.File;

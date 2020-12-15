@@ -47,7 +47,7 @@ public class RarriateClient extends AbstractClient {
 
     @Override
     public void connect(InetSocketAddress serverAddress, InetSocketAddress clientUDPAddress) throws ClientException {
-        try{
+        try {
             isWork = true;
             selector = Selector.open();
 
@@ -65,7 +65,7 @@ public class RarriateClient extends AbstractClient {
             TCPFrame serverResponseFrame = tcpFrameFactory.readTCPFrame(clientSocketChannel);
 
             //System.out.println("Получил пакет с инфой о сервере");
-            if ((serverResponseFrame!=null)&&(serverResponseFrame.getType() == 2)){
+            if ((serverResponseFrame != null) && (serverResponseFrame.getType() == 2)) {
                 clientUuid = (UUID) serverResponseFrame.getContent()[1];
                 serverUDPAddress = (InetSocketAddress) serverResponseFrame.getContent()[2];
                 serverUuid = (UUID) serverResponseFrame.getContent()[3];
@@ -84,17 +84,17 @@ public class RarriateClient extends AbstractClient {
                 //System.out.println("Все каналы прослушиваются");
                 log.info("Успешно настроено соединение с сервером.");
 
-                while (isWork){
+                while (isWork) {
                     selector.select();
                     Set<SelectionKey> selectionKeys = selector.selectedKeys();
                     Iterator<SelectionKey> iterator = selectionKeys.iterator();
-                    while (iterator.hasNext()){
+                    while (iterator.hasNext()) {
                         SelectionKey key = iterator.next();
 
-                        if (key.isReadable()){
+                        if (key.isReadable()) {
                             keyManager.read(this, key);
                         }
-                        if (key.isWritable()){
+                        if (key.isWritable()) {
                             keyManager.write(this);
                         }
                         iterator.remove();
@@ -103,13 +103,16 @@ public class RarriateClient extends AbstractClient {
             } else {
                 //System.out.println("Пакет неверен");
                 clientSocketChannel.close();
-                if ((serverResponseFrame!=null)&&(serverResponseFrame.getType() == 3)){
+                if ((serverResponseFrame != null) && (serverResponseFrame.getType() == 3)) {
                     log.warn("Невозможно подключиться к серверу : данный ник уже занят.");
                     throw new AlreadyRegisteredNameException();
                 } else {
                     log.warn("Сервер отвечает неправильным протоколом");
                 }
             }
+        } catch (UnresolvedAddressException ex) {
+            log.warn("Неправильный адрес, привет");
+            throw new ClientException("Unknown address", ex);
         } catch (IOException ex) {
             log.warn("Невозможно установить соединение с сервером: ошибка соединения.");
             throw new ClientException("Cannot connect client", ex);

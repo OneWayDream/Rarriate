@@ -1,6 +1,5 @@
 package ru.itis.view.components;
 
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import ru.itis.utils.FontLoader;
 

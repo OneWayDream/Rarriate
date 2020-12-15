@@ -3,7 +3,6 @@ package ru.itis.network.utils;
 import javafx.application.Platform;
 import ru.itis.RarriateApplication;
 import ru.itis.client.AbstractClient;
-import ru.itis.entities.blocks.Block;
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.exceptions.*;
 import ru.itis.network.client.RarriateClient;
@@ -38,7 +37,7 @@ public class RarriateClientKeyManager implements ClientKeyManager {
                         break;
                     case 6:
                         BlockDto blockDto = (BlockDto) messageContent[1];
-                        ((RarriateClient) client).getWorld().getMap().getBlocks().remove(BlockDto.to(blockDto));
+                        ((RarriateClient) client).getWorld().getMap().getAbstractBlocks().remove(BlockDto.to(blockDto));
                         Platform.runLater(()->
                                         RarriateApplication.getGame().updateBlocks(2,blockDto.getType(), blockDto.getCoordX(), blockDto.getCoordY())
                                 );
@@ -46,7 +45,7 @@ public class RarriateClientKeyManager implements ClientKeyManager {
                         break;
                     case 8:
                         BlockDto blockDto1 = (BlockDto) messageContent[1];
-                        ((RarriateClient) client).getWorld().getMap().getBlocks().add(BlockDto.to(blockDto1));
+                        ((RarriateClient) client).getWorld().getMap().getAbstractBlocks().add(BlockDto.to(blockDto1));
                         Platform.runLater(()->
                                         RarriateApplication.getGame().updateBlocks(1,blockDto1.getType(), blockDto1.getCoordX(), blockDto1.getCoordY())
                                 );

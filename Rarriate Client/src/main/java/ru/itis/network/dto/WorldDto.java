@@ -23,7 +23,7 @@ public class WorldDto implements Serializable {
     public static WorldDto from (World world){
         return WorldDto.builder()
                 .players(PlayerDto.from(world.getPlayers()))
-                .blocks(BlockDto.from(world.getMap().getBlocks()))
+                .blocks(BlockDto.from(world.getMap().getAbstractBlocks()))
                 .build();
     }
 

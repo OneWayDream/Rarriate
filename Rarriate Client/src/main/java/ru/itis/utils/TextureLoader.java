@@ -40,17 +40,6 @@ public class TextureLoader {
         return null;
     }
 
-    public static Image getPlayer1Texture() {
-        try {
-            return new Image(Objects.requireNonNull(TextureLoader.class
-                    .getClassLoader()
-                    .getResourceAsStream("img/players/player1_stay.png")));
-        } catch (NullPointerException e) {
-            RarriateStart.showError(new ImageFileNotFoundException("Can't find player1_stay.png file", e));
-        }
-        return null;
-    }
-
     public static Image[] getPlayer1SpriteRight() {
         try {
             Image[] images = new Image[3];

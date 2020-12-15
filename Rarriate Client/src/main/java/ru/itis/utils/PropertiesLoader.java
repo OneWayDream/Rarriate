@@ -5,7 +5,6 @@ import ru.itis.start.RarriateStart;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.*;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;

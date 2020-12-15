@@ -20,6 +20,14 @@ public class ViewManager {
         }
     }
 
+    public void setMainMenuWithInfoScene(String text) {
+        boolean fullscreen = mainStage.isFullScreen();
+        mainStage.setScene(new MainMenu(mainStage, this).getInfoScene(text));
+        if (fullscreen){
+            mainStage.setFullScreen(true);
+        }
+    }
+
     public void setGameScene() {
         boolean fullscreen = mainStage.isFullScreen();
         mainStage.setScene(new Game(mainStage, this).getGameScene());

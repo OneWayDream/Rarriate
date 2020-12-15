@@ -1,5 +1,6 @@
 package ru.itis;
 
+import javafx.application.Platform;
 import lombok.extern.slf4j.Slf4j;
 import ru.itis.entities.World;
 import ru.itis.entities.player.AbstractPlayer;
@@ -15,6 +16,7 @@ import ru.itis.view.Game;
 
 import java.io.IOException;
 import java.net.*;
+import java.nio.channels.UnresolvedAddressException;
 
 @Slf4j
 public class RarriateApplication {
@@ -25,6 +27,8 @@ public class RarriateApplication {
     protected static RarriateClient client;
     protected static RarriateServer server;
     protected static Game game;
+
+    protected static int errorCode = 0;
 
     public static RarriateClient getClient() {
         return client;
@@ -81,7 +85,7 @@ public class RarriateApplication {
             } catch (ClientException ex) {
                 if (ex.getCause() instanceof ClientDisconnectException){
                     disconnect();
-                    //Если оффнули сервер
+                    //Если оффнули сервер by host
                 } else {
                     throw new ClientWorkException(ex.getMessage(), ex);
                 }
@@ -114,8 +118,18 @@ public class RarriateApplication {
             } catch (ClientException ex) {
                 if (ex.getCause() instanceof ClientDisconnectException){
                     disconnect();
+                    Platform.runLater(() -> {
+                        getGame().exitToMainMenuWithInfo("Server was closed");
+                    });
                     //Если оффнули сервер
-                } else {
+                } else if (ex.getCause() instanceof AlreadyRegisteredNameException) {
+                    errorCode = 1;
+                    disconnect();
+                } else if (ex.getCause() instanceof UnresolvedAddressException) {
+                    errorCode = 2;
+                    disconnect();
+                }
+                else {
                     throw new ClientWorkException(ex.getMessage(), ex);
                 }
             }
@@ -136,8 +150,8 @@ public class RarriateApplication {
         } catch (InterruptedException e) {
             //ignore
         }
-        return client.getWorld();
 
+        return client == null ? null : client.getWorld();
     }
 
     public static void disconnect(){
@@ -181,5 +195,9 @@ public class RarriateApplication {
             }
         }
         return result;
+    }
+
+    public static int getErrorCode() {
+        return errorCode;
     }
 }

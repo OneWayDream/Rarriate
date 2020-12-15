@@ -1,10 +1,8 @@
 package ru.itis.network.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.itis.entities.blocks.Block;
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.exceptions.*;
-import ru.itis.network.dto.BlockDto;
 import ru.itis.network.dto.PlayerDto;
 import ru.itis.network.dto.WorldDto;
 import ru.itis.network.server.RarriateServer;
@@ -12,7 +10,6 @@ import ru.itis.protocol.TCPFrame;
 import ru.itis.protocol.UDPFrame;
 import ru.itis.server.AbstractServer;
 import ru.itis.utils.ClientEntry;
-import ru.itis.utils.Player;
 import ru.itis.utils.ServerKeyManager;
 
 import java.io.IOException;
@@ -190,7 +187,7 @@ public class RarriateServerKeyManager implements ServerKeyManager {
                     Object[] messageContent = tcpFrame.getContent();
                     switch (tcpFrame.getType()){
                         case 5:
-//                            ((RarriateServer) server).getWorld().getMap().getBlocks()
+//                            ((RarriateServer) server).getWorld().getMap().getAbstractBlocks()
 //                                    .remove(BlockDto.to((BlockDto) messageContent[1]));
                             server.sendBroadcastTCP(
                                     server.getTcpFrameFactory().createTCPFrame(6, messageUuid, messageContent[1]),
@@ -198,7 +195,7 @@ public class RarriateServerKeyManager implements ServerKeyManager {
                             );
                             break;
                         case 7:
-//                            ((RarriateServer) server).getWorld().getMap().getBlocks()
+//                            ((RarriateServer) server).getWorld().getMap().getAbstractBlocks()
 //                                    .add(BlockDto.to((BlockDto) messageContent[1]));
                             server.sendBroadcastTCP(
                                     server.getTcpFrameFactory().createTCPFrame(8, messageUuid, messageContent[1]),

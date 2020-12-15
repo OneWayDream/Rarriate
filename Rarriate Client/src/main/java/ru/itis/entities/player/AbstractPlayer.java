@@ -5,7 +5,6 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.geometry.Point2D;
 import ru.itis.entities.Inventory;
-import ru.itis.entities.items.implItems.StoneBlockItem;
 import ru.itis.utils.MyPoint2D;
 
 import java.io.Serializable;

@@ -1,7 +1,6 @@
 package ru.itis.entities.items.implItems;
 
 import ru.itis.entities.items.AbstractItem;
-import ru.itis.utils.FileLoader;
 import ru.itis.utils.TextureLoader;
 
 public class StoneBlockItem extends AbstractItem {

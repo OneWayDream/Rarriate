@@ -91,7 +91,7 @@ public class RarriateTCPFrameFactory implements TCPFrameFactory {
                         case 8:
                             objects = new Object[2];
                             objects[0] = inObject.readObject(); //Message id
-                            objects[1] = inObject.readObject(); //Block data (5-6 - break block, 7-8 - place block)
+                            objects[1] = inObject.readObject(); //AbstractBlock data (5-6 - break block, 7-8 - place block)
                             break;
                         case 9:
                             objects = new Object[2];

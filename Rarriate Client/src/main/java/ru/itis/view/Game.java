@@ -7,17 +7,18 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.Pane;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
 import ru.itis.RarriateApplication;
 import ru.itis.entities.Map;
 import ru.itis.entities.World;
-import ru.itis.entities.blocks.Block;
-import ru.itis.entities.blocks.implBlocks.BedrockBlock;
+import ru.itis.entities.blocks.AbstractBlock;
+import ru.itis.entities.blocks.implBlocks.*;
 import ru.itis.entities.blocks.implBlocks.DirtBlock;
-import ru.itis.entities.blocks.implBlocks.GrassBlock;
 import ru.itis.entities.blocks.implBlocks.StoneBlock;
 import ru.itis.entities.items.AbstractItem;
 import ru.itis.entities.items.implItems.DirtBlockItem;
@@ -27,7 +28,6 @@ import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.entities.player.implPlayers.Player;
 import ru.itis.exceptions.ClientException;
 import ru.itis.network.dto.BlockDto;
-import ru.itis.protocol.TCPFrame;
 import ru.itis.utils.FileLoader;
 import ru.itis.utils.MediaLoader;
 import ru.itis.utils.PropertiesLoader;
@@ -40,6 +40,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 public class Game {
 
     protected static final int SPEED = 10;
@@ -55,7 +56,7 @@ public class Game {
     protected AbstractPlayer player;
     protected List<AbstractPlayer> players;
     protected ImageView inventorySprite;
-    protected List<Block> blocks;
+    protected List<AbstractBlock> abstractBlocks;
 
     protected ViewManager viewManager;
 
@@ -77,16 +78,20 @@ public class Game {
 
     //SinglePlayer game
     public Game(Stage stage, ViewManager viewManager){
+        log.info("Создается одиночная игра");
         createGUI(stage, viewManager);
+        log.info("Одиночная игра создалась");
     }
 
     //MultiPlayer game
     public Game(Stage stage, ViewManager viewManager, World world, AbstractPlayer player, int port) {
+        log.info("Создается многопользовательская игра");
         this.player = player;
         this.world = world;
         this.players = world.getPlayers();
         this.port = port;
         createGUI(stage, viewManager);
+        log.info("Многопользовательская игра создалась");
     }
 
     protected void createGUI(Stage stage, ViewManager viewManager) {
@@ -123,6 +128,7 @@ public class Game {
     protected void addListeners() {
         addMainSceneClickListener();
         addEscKeyListener();
+        log.info("Слушатели установились");
 //        addMovingKeyListener();
     }
 
@@ -180,6 +186,7 @@ public class Game {
                 mainPane.getChildren().add(player);
             }
         }
+        log.info("Игроки установились");
     }
 
     protected void addMainSceneClickListener() {
@@ -187,12 +194,12 @@ public class Game {
             @Override
             public void handle(MouseEvent event) {
                 boolean isBlock;
-                for (Block block: blocks) {
-                    if (Math.abs(player.getTranslateX() - block.getTranslateX()) <= 150 &&
-                            Math.abs(player.getTranslateY() - block.getTranslateY()) <= 150) {
-                        if (block.getBoundsInParent().intersects(event.getX(), event.getY(), 1, 1)) {
-                            if (block.isBreakable()) {
-                                removeBlockAndAddToInventory(block);
+                for (AbstractBlock abstractBlock : abstractBlocks) {
+                    if (Math.abs(player.getTranslateX() - abstractBlock.getTranslateX()) <= 150 &&
+                            Math.abs(player.getTranslateY() - abstractBlock.getTranslateY()) <= 150) {
+                        if (abstractBlock.getBoundsInParent().intersects(event.getX(), event.getY(), 1, 1)) {
+                            if (abstractBlock.isBreakable()) {
+                                removeBlockAndAddToInventory(abstractBlock);
                             }
                             return;
                         }
@@ -223,7 +230,7 @@ public class Game {
         }
 
         movePlayerY((int)player.getVelocity().getY(), player);
-
+//        System.out.println("Main player: " + player.getName() + " " + player.getTranslateX() + " " + player.getTranslateY());
     }
 
 
@@ -239,6 +246,7 @@ public class Game {
                     if (abstractPlayer.getName().equals(name) && !abstractPlayer.getName().equals(this.player.getName())) {
                         abstractPlayer.setTranslateX(x);
                         abstractPlayer.setTranslateY(y);
+//                        System.out.println("Other players: " + abstractPlayer.getName() + " " + abstractPlayer.getTranslateX() + " " + abstractPlayer.getTranslateY());
                     }
                 }
                 break;
@@ -265,6 +273,7 @@ public class Game {
         AbstractPlayer newPlayer = new Player(name);
         players.add(newPlayer);
         createPlayer(newPlayer);
+        log.info("Пользователь " + name + " подключился");
     }
 
     protected void createPlayer() {
@@ -277,6 +286,7 @@ public class Game {
         player.setTranslateX((mainScene.getWidth() - player.getWidth())/2);
         player.setTranslateY((mainScene.getHeight() - player.getHeight())/2);
         mainPane.getChildren().add(player);
+        log.info("Игрок " + player.getName() + " добавлен");
     }
 
     protected void createPlayer(AbstractPlayer player) {
@@ -284,6 +294,7 @@ public class Game {
         player.setTranslateY((mainScene.getHeight() - player.getHeight())/2);
         mainPane.getChildren().add(player);
         addChatMessage(player.getName() + " has been connected");
+        log.info("Пользователь " + player.getName() + " подключился");
     }
 
     protected void deletePlayer(String name) {
@@ -292,6 +303,7 @@ public class Game {
                 mainPane.getChildren().remove(player);
                 players.remove(player);
                 addChatMessage(player.getName() + " has been disconnected");
+                log.info("Пользователь " + player.getName() + " отключился");
                 return;
             }
         }
@@ -308,15 +320,15 @@ public class Game {
         boolean movingRight = value > 0;
 
         for (int i = 0; i < Math.abs(value); i++) {
-            for (Block block : blocks) {
-                if (player.getBoundsInParent().intersects(block.getBoundsInParent())) {
+            for (AbstractBlock abstractBlock : abstractBlocks) {
+                if (player.getBoundsInParent().intersects(abstractBlock.getBoundsInParent())) {
                     if (movingRight) {
-                        if (player.getTranslateX() + player.getWidth() == block.getTranslateX()) {
+                        if (player.getTranslateX() + player.getWidth() == abstractBlock.getTranslateX()) {
                             return;
                         }
                     }
                     else {
-                        if (player.getTranslateX() == block.getTranslateX() + block.getWidth()) {
+                        if (player.getTranslateX() == abstractBlock.getTranslateX() + abstractBlock.getWidth()) {
                             return;
                         }
                     }
@@ -330,7 +342,7 @@ public class Game {
                                     RarriateApplication.getClient().getClientUuid(), player.getTranslateX(), player.getTranslateY())
                     );
                 } catch (ClientException e) {
-                    System.out.println("X");
+                    viewManager.setMainMenuWithInfoScene(e.getMessage());
                     System.err.println(e.getMessage());
                 }
             }
@@ -341,17 +353,17 @@ public class Game {
     protected void movePlayerY(int value, AbstractPlayer player) {
         boolean movingDown = value > 0;
         for (int i = 0; i < Math.abs(value); i++) {
-            for (Block block : blocks) {
-                if (player.getBoundsInParent().intersects(block.getBoundsInParent())) {
+            for (AbstractBlock abstractBlock : abstractBlocks) {
+                if (player.getBoundsInParent().intersects(abstractBlock.getBoundsInParent())) {
                     if (movingDown) {
-                        if (player.getTranslateY() + player.getHeight() == block.getTranslateY()) {
+                        if (player.getTranslateY() + player.getHeight() == abstractBlock.getTranslateY()) {
                             player.moveY(- 1);
                             player.setCanJump(true);
                             return;
                         }
                     }
                     else {
-                        if (player.getTranslateY() == block.getTranslateY() + block.getHeight()) {
+                        if (player.getTranslateY() == abstractBlock.getTranslateY() + abstractBlock.getHeight()) {
                             return;
                         }
                     }
@@ -365,7 +377,7 @@ public class Game {
                                     RarriateApplication.getClient().getClientUuid(), player.getTranslateX(), player.getTranslateY())
                     );
                 } catch (ClientException e) {
-                    System.out.println("Y");
+                    viewManager.setMainMenuWithInfoScene(e.getMessage());
                     System.err.println(e.getMessage());
                 }
             }
@@ -405,32 +417,33 @@ public class Game {
         if (world == null) {
             world = new World(new Map(mainScene.getHeight()), null);
         }
-        blocks = world.getMap().getBlocks();
-        for (Block block: blocks) {
-            setBlock(block);
+        abstractBlocks = world.getMap().getAbstractBlocks();
+        for (AbstractBlock abstractBlock : abstractBlocks) {
+            setBlock(abstractBlock);
         }
+        log.info("Мир инициализирован");
     }
 
     protected void removeBlock(double x, double y) {
-        for (Block block: blocks) {
-            if (block.getBoundsInParent().intersects(x+1,y,1,1)) {
-                blocks.remove(block);
-                mainPane.getChildren().remove(block);
+        for (AbstractBlock abstractBlock : abstractBlocks) {
+            if (abstractBlock.getBoundsInParent().intersects(x+1,y,1,1)) {
+                abstractBlocks.remove(abstractBlock);
+                mainPane.getChildren().remove(abstractBlock);
                 break;
             }
         }
     }
 
-    protected void removeBlockAndAddToInventory(Block block) {
-        player.getInventory().addItem(getItemFromBlock(block));
-        mainPane.getChildren().remove(block);
-        blocks.remove(block);
+    protected void removeBlockAndAddToInventory(AbstractBlock abstractBlock) {
+        player.getInventory().addItem(getItemFromBlock(abstractBlock));
+        mainPane.getChildren().remove(abstractBlock);
+        abstractBlocks.remove(abstractBlock);
         updateInventory();
         if (RarriateApplication.getClient() != null) {
             try {
                 RarriateApplication.getClient().sendTCPFrame(
                         RarriateApplication.getClient().getTcpFrameFactory().createTCPFrame(5,
-                                UUID.randomUUID(), BlockDto.from(block))
+                                UUID.randomUUID(), BlockDto.from(abstractBlock))
                 );
             } catch (ClientException e) {
                 System.err.println(e.getMessage());
@@ -440,18 +453,18 @@ public class Game {
 
     protected void setBlockFromInventory(double x, double y) {
         if (player.getInventory().getItems().size() > 0) {
-            Block block = getBlockFromItem(player.getInventory().getItems().get(0));
+            AbstractBlock abstractBlock = getBlockFromItem(player.getInventory().getItems().get(0));
             player.getInventory().getItems().remove(0);
-            block.setTranslateX(x - (x % Block.WIDTH));
-            block.setTranslateY(y - (y % Block.HEIGHT));
-            blocks.add(block);
-            setBlock(block);
+            abstractBlock.setTranslateX(x - (x % AbstractBlock.WIDTH));
+            abstractBlock.setTranslateY(y - (y % AbstractBlock.HEIGHT));
+            abstractBlocks.add(abstractBlock);
+            setBlock(abstractBlock);
             updateInventory();
             if (RarriateApplication.getClient() != null) {
                 try {
                     RarriateApplication.getClient().sendTCPFrame(
                             RarriateApplication.getClient().getTcpFrameFactory().createTCPFrame(7,
-                                    UUID.randomUUID(), BlockDto.from(block))
+                                    UUID.randomUUID(), BlockDto.from(abstractBlock))
                     );
                 } catch (ClientException e) {
                     System.err.println(e.getMessage());
@@ -470,6 +483,7 @@ public class Game {
 
         inventoryPane = new Pane();
         mainPane.getChildren().add(inventoryPane);
+        log.info("Инвентарь инициализирован");
     }
 
     protected void updateInventory() {
@@ -492,8 +506,8 @@ public class Game {
         mainPane.getChildren().add(inventoryPane);
     }
 
-    protected AbstractItem getItemFromBlock(Block block) {
-        switch (block.getBlockId()) {
+    protected AbstractItem getItemFromBlock(AbstractBlock abstractBlock) {
+        switch (abstractBlock.getBlockId()) {
             case 1:
                 return new StoneBlockItem();
             case 2:
@@ -505,7 +519,7 @@ public class Game {
         }
     }
 
-    protected Block getBlockFromItem(AbstractItem item) {
+    protected AbstractBlock getBlockFromItem(AbstractItem item) {
         switch (item.getItemId()) {
             case 1:
                 return new StoneBlock();
@@ -516,6 +530,11 @@ public class Game {
             default:
                 return null;
         }
+    }
+
+    public void exitToMainMenuWithInfo(String text) {
+        viewManager.setMainMenuWithInfoScene(text);
+        log.info("Произошла ошибка по причине " + text);
     }
 
     protected ModernButton createExitToMainMenuButton() {
@@ -532,33 +551,33 @@ public class Game {
         return exit;
     }
 
-    protected void setBlock(Block block) {
-        mainPane.getChildren().add(block);
+    protected void setBlock(AbstractBlock abstractBlock) {
+        mainPane.getChildren().add(abstractBlock);
     }
 
     protected void setBlock(int id, double x, double y) {
-        Block block = null;
+        AbstractBlock abstractBlock = null;
 
         switch (id) {
             case 1:
-                block = new StoneBlock();
+                abstractBlock = new StoneBlock();
                 break;
             case 2:
-                block = new DirtBlock();
+                abstractBlock = new DirtBlock();
                 break;
             case 3:
-                block = new GrassBlock();
+                abstractBlock = new GrassBlock();
                 break;
             case 4:
-                block = new BedrockBlock();
+                abstractBlock = new BedrockBlock();
                 break;
             default:
                 return;
         }
-        block.setTranslateX(x);
-        block.setTranslateY(y);
-        blocks.add(block);
-        mainPane.getChildren().add(block);
+        abstractBlock.setTranslateX(x);
+        abstractBlock.setTranslateY(y);
+        abstractBlocks.add(abstractBlock);
+        mainPane.getChildren().add(abstractBlock);
 
     }
 
@@ -569,6 +588,7 @@ public class Game {
     protected void exitToMainMenu() {
         stopPlayingBackgroundMusic();
         viewManager.setMainMenuScene();
+        log.info("Игрок " + player.getName() + " отключился");
     }
 
     protected void playGameBackgroundMusic() {
@@ -585,6 +605,7 @@ public class Game {
         chat.setFill(Color.WHITE);
         mainPane.getChildren().add(chat);
 
+        if (RarriateApplication.getClient() != null) {
             addChatMessage("Port: " + port);
         }
     }

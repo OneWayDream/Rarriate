@@ -11,7 +11,6 @@ import javafx.scene.layout.*;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import ru.itis.RarriateApplication;
-import ru.itis.entities.Inventory;
 import ru.itis.entities.Map;
 import ru.itis.entities.World;
 import ru.itis.entities.player.AbstractPlayer;
@@ -76,6 +75,11 @@ public class MainMenu {
         return mainScene;
     }
 
+    public Scene getInfoScene(String text) {
+        setInfoScene(text);
+        return mainScene;
+    }
+
     private void setMainMenuScene() {
         mainPane.getChildren().clear();
 
@@ -124,7 +128,7 @@ public class MainMenu {
         createBackButton();
     }
 
-    private void setInfoScene(String text) {
+    public void setInfoScene(String text) {
         mainPane.getChildren().clear();
 
         createLogo();
@@ -221,10 +225,27 @@ public class MainMenu {
             @Override
             public void handle(MouseEvent event) {
                 saveName();
-                int port = Integer.parseInt(portField.getText());
+                int port = 0;
+                try {
+                    port = Integer.parseInt(portField.getText());
+                } catch (NumberFormatException e) {
+                    setInfoScene("Port must be integer");
+                }
                 Player player = new Player();
                 World world = RarriateApplication.connectToServer(new InetSocketAddress(ipField.getText(), port), player);
-                viewManager.setMultiPlayerScene(world, player, port);
+                if (world != null) {
+                    viewManager.setMultiPlayerScene(world, player, port);
+                } else {
+                    switch (RarriateApplication.getErrorCode()) {
+                        case 1:
+                            setInfoScene("This nickname already in use");
+                            break;
+                        case 2:
+                            setInfoScene("Unknown address");
+                            break;
+                    }
+
+                }
             }
         });
         mainPane.getChildren().add(enter);
