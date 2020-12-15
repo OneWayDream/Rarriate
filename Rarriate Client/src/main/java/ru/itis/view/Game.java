@@ -1,7 +1,6 @@
 package ru.itis.view;
 
 import javafx.animation.AnimationTimer;
-import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
@@ -326,13 +325,14 @@ public class Game {
                 }
             }
             player.moveX(movingRight ? 1 : -1);
-            if (port != null) {
+            if (RarriateApplication.getClient() != null) {
                 try {
                     RarriateApplication.getClient().sendUDPFrame(
                             RarriateApplication.getClient().getUdpFrameFactory().createUDPFrame(0,
                                     RarriateApplication.getClient().getClientUuid(), player.getTranslateX(), player.getTranslateY())
                     );
                 } catch (ClientException e) {
+                    System.out.println("X");
                     System.err.println(e.getMessage());
                 }
             }
@@ -360,13 +360,14 @@ public class Game {
                 }
             }
             player.moveY(movingDown ? 1 : -1);
-            if (port != null) {
+            if (RarriateApplication.getClient() != null) {
                 try {
                     RarriateApplication.getClient().sendUDPFrame(
                             RarriateApplication.getClient().getUdpFrameFactory().createUDPFrame(0,
                                     RarriateApplication.getClient().getClientUuid(), player.getTranslateX(), player.getTranslateY())
                     );
                 } catch (ClientException e) {
+                    System.out.println("Y");
                     System.err.println(e.getMessage());
                 }
             }
@@ -413,9 +414,9 @@ public class Game {
     }
 
     protected void removeBlock(double x, double y) {
-        for (Block block1 : blocks) {
-            System.out.println(block1.getTranslateX() + " " + block1.getTranslateY());
-        }
+//        for (Block block1 : blocks) {
+//            System.out.println(block1.getTranslateX() + " " + block1.getTranslateY());
+//        }
         for (Block block: blocks) {
             if (block.getBoundsInParent().intersects(x+1,y,1,1)) {
 //                System.out.println("Remove: " + block.getTranslateX() + " " + block.getTranslateY());
@@ -425,10 +426,10 @@ public class Game {
                 break;
             }
         }
-        System.out.println("----------------------------------");
-        for (Block block1 : blocks) {
-            System.out.println(block1.getTranslateX() + " " + block1.getTranslateY());
-        }
+//        System.out.println("----------------------------------");
+//        for (Block block1 : blocks) {
+//            System.out.println(block1.getTranslateX() + " " + block1.getTranslateY());
+//        }
     }
 
     protected void removeBlockAndAddToInventory(Block block) {
@@ -535,6 +536,7 @@ public class Game {
             public void handle(MouseEvent event) {
                 timer.stop();
                 RarriateApplication.disconnect();
+                port = null;
                 exitToMainMenu();
             }
         });

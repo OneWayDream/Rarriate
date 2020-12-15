@@ -13,6 +13,7 @@ import ru.itis.protocol.TCPFrame;
 import ru.itis.protocol.UDPFrame;
 import ru.itis.utils.ClientKeyManager;
 
+import java.nio.BufferUnderflowException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.IllegalBlockingModeException;
 import java.nio.channels.SelectionKey;
@@ -59,7 +60,7 @@ public class RarriateClientKeyManager implements ClientKeyManager {
                 throw new KeyManagerException(ex.getMessage(), ex);
             } catch (IncorrectFCSException ex) {
                 //TODO reaction on incorrect frame
-            } catch (IllegalBlockingModeException ex){
+            } catch (IllegalBlockingModeException | BufferUnderflowException ex){
                 throw new ClientDisconnectException(key);
             }
         } else {

@@ -1,11 +1,9 @@
 package ru.itis;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.itis.entities.World;
 import ru.itis.entities.player.AbstractPlayer;
-import ru.itis.exceptions.ClientException;
-import ru.itis.exceptions.ClientWorkException;
-import ru.itis.exceptions.ServerException;
-import ru.itis.exceptions.ServerWorkException;
+import ru.itis.exceptions.*;
 import ru.itis.network.client.RarriateClient;
 import ru.itis.network.protocol.RarriateTCPFrameFactory;
 import ru.itis.network.protocol.RarriateUDPFrameFactory;
@@ -18,6 +16,7 @@ import ru.itis.view.Game;
 import java.io.IOException;
 import java.net.*;
 
+@Slf4j
 public class RarriateApplication {
 
     protected static int minPortValue = 5000;
@@ -80,7 +79,12 @@ public class RarriateApplication {
             try {
                 client.connect(serverTCPAddress, clientUDPAddress);
             } catch (ClientException ex) {
-                throw new ClientWorkException(ex.getMessage(), ex);
+                if (ex.getCause() instanceof ClientDisconnectException){
+                    disconnect();
+                    //Если оффнули сервер
+                } else {
+                    throw new ClientWorkException(ex.getMessage(), ex);
+                }
             }
         };
         Thread clientThread = new Thread(clientRun);
@@ -108,7 +112,12 @@ public class RarriateApplication {
             try {
                 client.connect(serverAddress, clientUDPAddress);
             } catch (ClientException ex) {
-                throw new ClientWorkException(ex.getMessage(), ex);
+                if (ex.getCause() instanceof ClientDisconnectException){
+                    disconnect();
+                    //Если оффнули сервер
+                } else {
+                    throw new ClientWorkException(ex.getMessage(), ex);
+                }
             }
         };
         Thread clientThread = new Thread(clientRun);
@@ -116,7 +125,11 @@ public class RarriateApplication {
         try{
             clientThread.start();
         } catch (ClientWorkException ex){
-            RarriateStart.main(null);
+            if (ex.getCause() instanceof ClientDisconnectException){
+                disconnect();
+            } else {
+                throw new ClientWorkException(ex.getMessage(), ex);
+            }
         }
         try{
             Thread.sleep(5000); //Time to server settings
@@ -130,11 +143,13 @@ public class RarriateApplication {
     public static void disconnect(){
         if (server!=null){
             server.stop();
+            server = null;
         }
         if (client!=null){
             client.disconnect();
+            client = null;
         }
-        game = null;
+        //game = null;
     }
 
     protected static int counter;

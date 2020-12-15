@@ -1,5 +1,6 @@
 package ru.itis.network.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.itis.entities.blocks.Block;
 import ru.itis.entities.player.AbstractPlayer;
 import ru.itis.exceptions.*;
@@ -16,28 +17,32 @@ import ru.itis.utils.ServerKeyManager;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.BufferUnderflowException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.IllegalBlockingModeException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.UUID;
 
+@Slf4j
 public class RarriateServerKeyManager implements ServerKeyManager {
 
     @Override
     public void register(AbstractServer server) throws KeyManagerException {
 
-        System.out.println("Кто-то подключился, иду проверять");
+        //System.out.println("Кто-то подключился, иду проверять");
 
         SocketChannel client = null;
         try {
             client = server.getServerTCPChannel().accept();
 
-            System.out.println("Подключил клиента");
+            log.info("Было обнаружено новое соединение от клиента " + client.getRemoteAddress() + ".");
+
+            //System.out.println("Подключил клиента");
 
             TCPFrame tcpFrame = server.getTcpFrameFactory().readTCPFrame(client);
 
-            System.out.println("Принял пакет с информацией");
+            //System.out.println("Принял пакет с информацией");
             if (tcpFrame!=null){
                 if (tcpFrame.getType()==1){
                     Object[] userData = tcpFrame.getContent();
@@ -62,17 +67,17 @@ public class RarriateServerKeyManager implements ServerKeyManager {
                             isUniqueUuid = true;
                         }
 
-                        System.out.println("Проверил, всё ок");
+                        //System.out.println("Проверил, всё ок");
 
 
                         UUID responseFrameId = UUID.randomUUID();
                         TCPFrame tcpFrameResponse = server.getTcpFrameFactory().createTCPFrame(2,
                                 responseFrameId, clientUUID, server.getServerUDPChannel().getLocalAddress(),
                                 server.getServerUuid(), WorldDto.from(((RarriateServer) server).getWorld()));
-                        System.out.println("Отправляю пакет с настройками");
+                        // System.out.println("Отправляю пакет с настройками");
                         server.getTcpFrameFactory().writeTCPFrame(client, tcpFrameResponse);
 
-                        System.out.println("Отправил пакет с настройками");
+                        //System.out.println("Отправил пакет с настройками");
 
                         ClientEntry clientEntry = RarriateClientEntry.builder()
                                 .player(PlayerDto.to((PlayerDto) userData[2]))
@@ -95,24 +100,30 @@ public class RarriateServerKeyManager implements ServerKeyManager {
                         client.configureBlocking(false);
                         client.register(server.getSelector(), SelectionKey.OP_READ);
 
-                        System.out.println("Поставил клиента на прослушку");
+                        //System.out.println("Поставил клиента на прослушку");
+                        log.info("Игрок " + player.getName() + " был успешно настроен и подключен к серверу.");
 
                     } else {
                         TCPFrame existNickname = server.getTcpFrameFactory().createTCPFrame(3);
                         server.getTcpFrameFactory().writeTCPFrame(client, existNickname);
                         closeConnection(client);
+                        log.info("Клиент" + client + " был отключен по причине повторного ника.");
                     }
                 } else {
                     closeConnection(client);
+                    log.info("Клиент" + client + "был отключен из-за неправильного типа пакета.");
                 }
             } else {
                 closeConnection(client);
+                log.info("Клиент" + client + "был отключен из-за неправильного формата пакета.");
             }
         } catch (IOException|TCPFrameFactoryException ex) {
             closeConnection(client);
+            log.info("Клиент" + client + "был отключен из-за ошибки соединения");
         }  catch (IncorrectFCSException e) {
             //TODO reaction on incorrect frame
         } catch (ServerException ex){
+            log.warn("Не удалось разослать информацию о новом клиенте остальным клиентам.");
             throw new KeyManagerException("Cannot send broadcast to other users", ex);
         }
     }
@@ -213,7 +224,7 @@ public class RarriateServerKeyManager implements ServerKeyManager {
                 throw new KeyManagerException(ex.getMessage(), ex);
             } catch (IncorrectFCSException ex) {
                 //TODO reaction on incorrect frame
-            } catch (IllegalBlockingModeException ex){
+            } catch (IllegalBlockingModeException| BufferUnderflowException ex){
                 throw new ClientDisconnectException(key);
             } catch (ServerException ex){
                 throw new KeyManagerException("Cannot send broadcast to other users", ex);

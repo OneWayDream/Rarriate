@@ -2,6 +2,7 @@ package ru.itis.server;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import lombok.extern.slf4j.Slf4j;
 import ru.itis.exceptions.*;
 import ru.itis.protocol.TCPFrame;
 import ru.itis.protocol.TCPFrameFactory;
@@ -23,6 +24,7 @@ import java.util.UUID;
 @ToString
 @EqualsAndHashCode
 @SuperBuilder
+@Slf4j
 public abstract class AbstractServer implements Server {
 
     protected Selector selector;
@@ -30,7 +32,7 @@ public abstract class AbstractServer implements Server {
     protected DatagramChannel serverUDPChannel;
     protected UUID serverUuid;
     protected ServerKeyManager keyManager;
-    protected HashSet<ClientEntry> clientSet;
+    protected Set<ClientEntry> clientSet;
     protected UDPFrameFactory udpFrameFactory;
     protected TCPFrameFactory tcpFrameFactory;
     protected boolean isWork;
@@ -51,7 +53,6 @@ public abstract class AbstractServer implements Server {
             serverUDPChannel.configureBlocking(false);
             serverUDPChannel.register(selector, SelectionKey.OP_READ);
 
-            //System.out.println("Сервер успешно запущен, начата проверка");
         } catch (IOException ex){
             throw new ServerException("Cannot create server: connection exception.", ex);
         }
@@ -75,19 +76,24 @@ public abstract class AbstractServer implements Server {
                     iterator.remove();
                 }
             } catch (IOException ex){
+                log.warn("Ошибка при запуске сервера : невозможно запустить сервер");
                 throw new ServerException("Cannot create server: connection exception.", ex);
             } catch (KeyManagerException ex){
+                log.warn("Ошибка при работе сервера : ошибка при обработке пакетов или соединений");
                 throw new ServerException(ex.getMessage(), ex);
             } catch (ClientDisconnectException ex){
                 ex.getSelectionKey().cancel();
-                for (ClientEntry clientEntry: clientSet) {
-                    if (clientEntry.getSocketChannel().equals(ex.getSelectionKey().channel())){
-                        clientSet.remove(clientEntry);
+                if (clientSet!=null){
+                    for (ClientEntry clientEntry: clientSet) {
+                        if (clientEntry.getSocketChannel().equals(ex.getSelectionKey().channel())){
+                            clientSet.remove(clientEntry);
+                        }
                     }
                 }
-                System.out.println("Client " + ex.getSelectionKey().channel() + " was disconnected");
+                log.info("Client " + ex.getSelectionKey().channel() + " was disconnected");
             } catch (ClosedSelectorException ex){
-                System.out.println("Сервер был успешно выключен");
+                log.info("Сервер был выключен");
+                //System.out.println("Сервер был успешно выключен");
             }
         }
     }
@@ -166,6 +172,9 @@ public abstract class AbstractServer implements Server {
         try{
             serverTCPChannel.close();
             serverUDPChannel.close();
+            for (ClientEntry clientEntry : clientSet){
+                clientEntry.getSocketChannel().close();
+            }
             selector.close();
         } catch (IOException ex){
             //ignore

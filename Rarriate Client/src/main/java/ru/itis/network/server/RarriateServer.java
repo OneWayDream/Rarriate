@@ -8,8 +8,10 @@ import ru.itis.protocol.UDPFrameFactory;
 import ru.itis.server.AbstractServer;
 import ru.itis.utils.ServerKeyManager;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 @Setter
@@ -23,7 +25,7 @@ public class RarriateServer extends AbstractServer {
                                     TCPFrameFactory tcpFrameFactory, World world){
         return RarriateServer.builder()
                 .keyManager(keyManager)
-                .clientSet(new HashSet<>())
+                .clientSet(Collections.newSetFromMap(new ConcurrentHashMap<>()))
                 .udpFrameFactory(udpFrameFactory)
                 .tcpFrameFactory(tcpFrameFactory)
                 .serverUuid(UUID.randomUUID())
