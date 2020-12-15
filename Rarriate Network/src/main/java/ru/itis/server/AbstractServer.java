@@ -85,9 +85,9 @@ public abstract class AbstractServer implements Server {
                         clientSet.remove(clientEntry);
                     }
                 }
-                //System.out.println("Client " + ex.getSelectionKey().channel() + " was disconnected");
+                System.out.println("Client " + ex.getSelectionKey().channel() + " was disconnected");
             } catch (ClosedSelectorException ex){
-                //System.out.println("Сервер был успешно выключен");
+                System.out.println("Сервер был успешно выключен");
             }
         }
     }

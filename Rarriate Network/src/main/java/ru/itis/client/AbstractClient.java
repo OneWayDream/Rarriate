@@ -60,7 +60,7 @@ public abstract class AbstractClient implements Client {
             clientSocketChannel.close();
             clientUDPChannel.close();
             selector.close();
-        } catch (IOException ex){
+        } catch (IOException|NullPointerException ex){
             //ignore
         }
     }
