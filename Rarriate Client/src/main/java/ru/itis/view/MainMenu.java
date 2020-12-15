@@ -124,6 +124,14 @@ public class MainMenu {
         createBackButton();
     }
 
+    private void setInfoScene(String text) {
+        mainPane.getChildren().clear();
+
+        createLogo();
+        createInfoFiled(text);
+        createBackButton();
+    }
+
     private void createLogo() {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream("img/Rarriate.png");
         Image logo = new Image(is);
@@ -268,6 +276,11 @@ public class MainMenu {
             }
         });
         mainPane.getChildren().add(back);
+    }
+
+    private void createInfoFiled(String text) {
+        ModernLabel infoField = new ModernLabel(text);
+        mainPane.getChildren().add(infoField);
     }
 
     private void saveName() {

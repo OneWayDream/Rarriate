@@ -223,7 +223,6 @@ public class Game {
         }
 
         movePlayerY((int)player.getVelocity().getY(), player);
-//        System.out.println("Client " + player.getTranslateX() + " " + player.getTranslateY());
 
     }
 
@@ -240,7 +239,6 @@ public class Game {
                     if (abstractPlayer.getName().equals(name) && !abstractPlayer.getName().equals(this.player.getName())) {
                         abstractPlayer.setTranslateX(x);
                         abstractPlayer.setTranslateY(y);
-//                        System.out.println("Client видит сервера как: " + abstractPlayer.getTranslateX() + " " + abstractPlayer.getTranslateY());
                     }
                 }
                 break;
@@ -414,22 +412,13 @@ public class Game {
     }
 
     protected void removeBlock(double x, double y) {
-//        for (Block block1 : blocks) {
-//            System.out.println(block1.getTranslateX() + " " + block1.getTranslateY());
-//        }
         for (Block block: blocks) {
             if (block.getBoundsInParent().intersects(x+1,y,1,1)) {
-//                System.out.println("Remove: " + block.getTranslateX() + " " + block.getTranslateY());
                 blocks.remove(block);
-
                 mainPane.getChildren().remove(block);
                 break;
             }
         }
-//        System.out.println("----------------------------------");
-//        for (Block block1 : blocks) {
-//            System.out.println(block1.getTranslateX() + " " + block1.getTranslateY());
-//        }
     }
 
     protected void removeBlockAndAddToInventory(Block block) {
@@ -596,7 +585,6 @@ public class Game {
         chat.setFill(Color.WHITE);
         mainPane.getChildren().add(chat);
 
-        if (port != null) {
             addChatMessage("Port: " + port);
         }
     }
