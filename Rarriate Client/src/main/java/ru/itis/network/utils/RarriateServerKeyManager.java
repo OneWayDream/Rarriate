@@ -218,10 +218,40 @@ public class RarriateServerKeyManager implements ServerKeyManager {
                     }
                 }
             } catch (TCPFrameFactoryException ex) {
-                throw new KeyManagerException(ex.getMessage(), ex);
+                if (ex.getCause().getMessage().contains("принудительно разорвал существующее подключение")){
+                    for (ClientEntry clientEntry : server.getClientSet()){
+                        if (clientEntry.getSocketChannel().equals(key.channel())){
+                            try{
+                                server.sendBroadcastTCP(
+                                        server.getTcpFrameFactory().createTCPFrame(
+                                                11, UUID.randomUUID(), ((RarriateClientEntry) clientEntry).getPlayer().getName()
+                                        ), (SocketChannel) key.channel()
+                                );
+                            } catch (ServerException broadcastEx) {
+                                throw new KeyManagerException("Cannot send broadcast to other users", broadcastEx);
+                            }
+                        }
+                    }
+                    throw new ClientDisconnectException(key);
+                } else {
+                    throw new KeyManagerException(ex.getMessage(), ex);
+                }
             } catch (IncorrectFCSException ex) {
                 //TODO reaction on incorrect frame
             } catch (IllegalBlockingModeException| BufferUnderflowException ex){
+                for (ClientEntry clientEntry : server.getClientSet()){
+                    if (clientEntry.getSocketChannel().equals(key.channel())){
+                        try{
+                            server.sendBroadcastTCP(
+                                    server.getTcpFrameFactory().createTCPFrame(
+                                            11, UUID.randomUUID(), ((RarriateClientEntry) clientEntry).getPlayer().getName()
+                                    ), (SocketChannel) key.channel()
+                            );
+                        } catch (ServerException broadcastEx) {
+                            throw new KeyManagerException("Cannot send broadcast to other users", broadcastEx);
+                        }
+                    }
+                }
                 throw new ClientDisconnectException(key);
             } catch (ServerException ex){
                 throw new KeyManagerException("Cannot send broadcast to other users", ex);

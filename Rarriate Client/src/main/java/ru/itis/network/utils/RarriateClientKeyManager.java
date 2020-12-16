@@ -54,6 +54,10 @@ public class RarriateClientKeyManager implements ClientKeyManager {
                     case 10:
                         //TODO write message in the chat
                         break;
+                    case 11:
+                        Platform.runLater(()->{
+                            RarriateApplication.getGame().deletePlayer((String) messageContent[1]);
+                        });
                 }
             } catch (TCPFrameFactoryException ex) {
                 throw new KeyManagerException(ex.getMessage(), ex);

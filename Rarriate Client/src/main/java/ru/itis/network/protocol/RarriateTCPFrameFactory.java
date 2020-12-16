@@ -104,6 +104,11 @@ public class RarriateTCPFrameFactory implements TCPFrameFactory {
                             objects[1] = inObject.readObject(); //Sender-nickname
                             objects[2] = inObject.readObject(); //Message-text
                             break;
+                        case 11:
+                            objects = new Object[2];
+                            objects[0] = inObject.readObject(); //Message id
+                            objects[1] = inObject.readObject(); //Player nickname
+                            break;
                         default:
                             objects = new Object[0];
                             break;

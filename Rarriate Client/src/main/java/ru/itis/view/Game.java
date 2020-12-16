@@ -273,7 +273,7 @@ public class Game {
         AbstractPlayer newPlayer = new Player(name);
         players.add(newPlayer);
         createPlayer(newPlayer);
-        log.info("Пользователь " + name + " подключился");
+        //log.info("Пользователь " + name + " подключился");
     }
 
     protected void createPlayer() {
@@ -294,10 +294,10 @@ public class Game {
         player.setTranslateY((mainScene.getHeight() - player.getHeight())/2);
         mainPane.getChildren().add(player);
         addChatMessage(player.getName() + " has been connected");
-        log.info("Пользователь " + player.getName() + " подключился");
+        //log.info("Пользователь " + player.getName() + " подключился");
     }
 
-    protected void deletePlayer(String name) {
+    public void deletePlayer(String name) {
         for (AbstractPlayer player: players) {
             if (player.getName().equals(name)) {
                 mainPane.getChildren().remove(player);
