@@ -56,7 +56,7 @@ public class Game {
     protected AbstractPlayer player;
     protected List<AbstractPlayer> players;
     protected ImageView inventorySprite;
-    protected List<AbstractBlock> abstractBlocks;
+    protected List<AbstractBlock> blocks;
 
     protected ViewManager viewManager;
 
@@ -119,7 +119,7 @@ public class Game {
         timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                update();
+                updateMainPlayer();
             }
         };
         timer.start();
@@ -194,7 +194,7 @@ public class Game {
             @Override
             public void handle(MouseEvent event) {
                 boolean isBlock;
-                for (AbstractBlock abstractBlock : abstractBlocks) {
+                for (AbstractBlock abstractBlock : blocks) {
                     if (Math.abs(player.getTranslateX() - abstractBlock.getTranslateX()) <= 150 &&
                             Math.abs(player.getTranslateY() - abstractBlock.getTranslateY()) <= 150) {
                         if (abstractBlock.getBoundsInParent().intersects(event.getX(), event.getY(), 1, 1)) {
@@ -213,7 +213,7 @@ public class Game {
         });
     }
 
-    protected void update() {
+    protected void updateMainPlayer() {
         if (up && player.getTranslateY() >= SPEED) {
             jumpPlayer(player);
         }
@@ -320,7 +320,7 @@ public class Game {
         boolean movingRight = value > 0;
 
         for (int i = 0; i < Math.abs(value); i++) {
-            for (AbstractBlock abstractBlock : abstractBlocks) {
+            for (AbstractBlock abstractBlock : blocks) {
                 if (player.getBoundsInParent().intersects(abstractBlock.getBoundsInParent())) {
                     if (movingRight) {
                         if (player.getTranslateX() + player.getWidth() == abstractBlock.getTranslateX()) {
@@ -353,7 +353,7 @@ public class Game {
     protected void movePlayerY(int value, AbstractPlayer player) {
         boolean movingDown = value > 0;
         for (int i = 0; i < Math.abs(value); i++) {
-            for (AbstractBlock abstractBlock : abstractBlocks) {
+            for (AbstractBlock abstractBlock : blocks) {
                 if (player.getBoundsInParent().intersects(abstractBlock.getBoundsInParent())) {
                     if (movingDown) {
                         if (player.getTranslateY() + player.getHeight() == abstractBlock.getTranslateY()) {
@@ -417,17 +417,17 @@ public class Game {
         if (world == null) {
             world = new World(new Map(mainScene.getHeight()), null);
         }
-        abstractBlocks = world.getMap().getAbstractBlocks();
-        for (AbstractBlock abstractBlock : abstractBlocks) {
+        blocks = world.getMap().getAbstractBlocks();
+        for (AbstractBlock abstractBlock : blocks) {
             setBlock(abstractBlock);
         }
         log.info("Мир инициализирован");
     }
 
     protected void removeBlock(double x, double y) {
-        for (AbstractBlock abstractBlock : abstractBlocks) {
+        for (AbstractBlock abstractBlock : blocks) {
             if (abstractBlock.getBoundsInParent().intersects(x+1,y,1,1)) {
-                abstractBlocks.remove(abstractBlock);
+                blocks.remove(abstractBlock);
                 mainPane.getChildren().remove(abstractBlock);
                 break;
             }
@@ -437,7 +437,7 @@ public class Game {
     protected void removeBlockAndAddToInventory(AbstractBlock abstractBlock) {
         player.getInventory().addItem(getItemFromBlock(abstractBlock));
         mainPane.getChildren().remove(abstractBlock);
-        abstractBlocks.remove(abstractBlock);
+        blocks.remove(abstractBlock);
         updateInventory();
         if (RarriateApplication.getClient() != null) {
             try {
@@ -457,7 +457,7 @@ public class Game {
             player.getInventory().getItems().remove(0);
             abstractBlock.setTranslateX(x - (x % AbstractBlock.WIDTH));
             abstractBlock.setTranslateY(y - (y % AbstractBlock.HEIGHT));
-            abstractBlocks.add(abstractBlock);
+            blocks.add(abstractBlock);
             setBlock(abstractBlock);
             updateInventory();
             if (RarriateApplication.getClient() != null) {
@@ -534,7 +534,7 @@ public class Game {
 
     public void exitToMainMenuWithInfo(String text) {
         viewManager.setMainMenuWithInfoScene(text);
-        log.info("Произошла ошибка по причине " + text);
+        log.info(text);
     }
 
     protected ModernButton createExitToMainMenuButton() {
@@ -576,7 +576,7 @@ public class Game {
         }
         abstractBlock.setTranslateX(x);
         abstractBlock.setTranslateY(y);
-        abstractBlocks.add(abstractBlock);
+        blocks.add(abstractBlock);
         mainPane.getChildren().add(abstractBlock);
 
     }
